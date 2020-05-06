@@ -514,6 +514,10 @@ function DataChoosePopupMenu_Callback(hObject, eventdata, handles)
 dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
 dataFrame = getappdata(handles.MainWindow,'dataFrame');
 
+%%%%%%%%%%%%
+handles.uitable1.Data = table2cell(dataFrame(1:20,1:5));
+handles.uitable1.ColumnName = dataFrameNamesAndTypes(1,:);
+
 dataName = getMenuString(handles.DataChoosePopupMenu);
 colNum = find(dataFrameNamesAndTypes(1,:)==dataName);
 
