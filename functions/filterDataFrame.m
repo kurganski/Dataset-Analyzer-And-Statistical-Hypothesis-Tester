@@ -40,3 +40,7 @@ for x = ['1', '2', '3']
     dataFrame( eval("filteredCol" + filterEquation + "filterValue"), :) = [];  
 
 end
+
+if isempty(dataFrame)
+    dataFrame = table(NaN);
+end

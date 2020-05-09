@@ -5,7 +5,7 @@ if nargin == 2
 end
 
 for x = 1:size(dataX,2)
-    plot(axesHandle, dataX(:,x), dataY, 'o');
+    plot(axesHandle, dataX(:,x), dataY, 's');
 end
 
 end
