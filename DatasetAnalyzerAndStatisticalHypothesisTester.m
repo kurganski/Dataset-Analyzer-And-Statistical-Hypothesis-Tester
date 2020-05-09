@@ -44,8 +44,6 @@ setappdata(handles.MainWindow,'graphHelpStr',graphsHelpInfos);
 % TODO: 
 % починить биноминал
 % при выборе другого графика - запоминать предыдушие выбранные
-% добавить 2 листа для просмотра переменных
-% увеличить област справки
 % внедрить остальные логические критерии
 % разбить критерии по кол-ву групп как на картинке
 % добавить таблицу сопряженности
@@ -55,9 +53,10 @@ setappdata(handles.MainWindow,'graphHelpStr',graphsHelpInfos);
 % CROSSTAB 
 % в фридмане разобраться с репсами
 % настроить повторояющийся аннова
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% ztest
+
 function OpenCsvMenu_Callback(hObject, eventdata, handles)
 
 [FileName, PathName] = uigetfile({'*.xlsx;*.xls;*.csv'}, 'Выберите файл таблицы данных');    
@@ -99,6 +98,14 @@ end
 setappdata(handles.MainWindow,'dataFrame',dataFrame);
 setappdata(handles.MainWindow,'dataFrameNamesAndTypes',dataFrameNamesAndTypes);
 
+handles.GraphPopupmenu.String = getappdata(handles.MainWindow,'graphs');
+handles.FilterPopupMenu1.String = ["" dataFrameNamesAndTypes(1,:)];
+handles.FilterPopupMenu2.String = ["" dataFrameNamesAndTypes(1,:)];
+handles.FilterPopupMenu3.String = ["" dataFrameNamesAndTypes(1,:)];
+handles.DataChoosePopupMenu.String = dataFrameNamesAndTypes(1,:);
+
+GraphPopupmenu_Callback(hObject, eventdata, handles);
+
 handles.GraphPopupmenu.Enable = 'On';
 handles.BuildButton.Enable = 'On';
 handles.FilterPopupMenu1.Enable = 'On';
@@ -113,18 +120,12 @@ handles.FilterValuePopupMenu3.Enable = 'On';
 handles.DataChoosePopupMenu.Enable = 'On';
 handles.DataList.Enable = 'On';
 handles.FilterShowCheckbox.Enable = 'On';
-
-handles.GraphPopupmenu.String = getappdata(handles.MainWindow,'graphs');
-handles.FilterPopupMenu1.String = ["" dataFrameNamesAndTypes(1,:)];
-handles.FilterPopupMenu2.String = ["" dataFrameNamesAndTypes(1,:)];
-handles.FilterPopupMenu3.String = ["" dataFrameNamesAndTypes(1,:)];
-handles.DataChoosePopupMenu.String = dataFrameNamesAndTypes(1,:);
-
-GraphPopupmenu_Callback(hObject, eventdata, handles);
-DataChoosePopupMenu_Callback(hObject, eventdata, handles);
+handles.DataTable.Visible = 'On';
 
 waitbar(1,h);
 close(h);
+
+FilterShowCheckbox_Callback(hObject, eventdata, handles); 
 
 
 function GraphPopupmenu_Callback(hObject, eventdata, handles)
@@ -506,60 +507,86 @@ else
     assert(0,"Неопределенный номер строки фильтра")    
 end
 
-DataChoosePopupMenu_Callback(hObject, eventdata, handles);
+eval("FilterValuePopupMenu" + handleNumber + "_Callback(hObject, eventdata, handles);");
+                
+
+function FilterValuePopupMenu1_Callback(hObject, eventdata, handles)
+
+if handles.FilterShowCheckbox.Value == 1
+    FilterShowCheckbox_Callback(hObject, eventdata, handles);    
+end
 
 
-function DataChoosePopupMenu_Callback(hObject, eventdata, handles)
+function FilterValuePopupMenu2_Callback(hObject, eventdata, handles)
+
+if handles.FilterShowCheckbox.Value == 1
+    FilterShowCheckbox_Callback(hObject, eventdata, handles);    
+end
+
+
+function FilterValuePopupMenu3_Callback(hObject, eventdata, handles)
+
+if handles.FilterShowCheckbox.Value == 1
+    FilterShowCheckbox_Callback(hObject, eventdata, handles);    
+end
+
+
+function FilterShowCheckbox_Callback(hObject, eventdata, handles)
+
+h = waitbar(0,'Выполняется отображение таблицы','WindowStyle','modal');
 
 dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
 dataFrame = getappdata(handles.MainWindow,'dataFrame');
 
-%%%%%%%%%%%%
-handles.uitable1.Data = table2cell(dataFrame(1:20,1:5));
-handles.uitable1.ColumnName = dataFrameNamesAndTypes(1,:);
-
-dataName = getMenuString(handles.DataChoosePopupMenu);
-colNum = find(dataFrameNamesAndTypes(1,:)==dataName);
+waitbar(0.1,h);
 
 if handles.FilterShowCheckbox.Value == 1
     dataFrame = filterDataFrame(dataFrame, dataFrameNamesAndTypes, handles);
 end
 
-data = dataFrame{:,colNum};
-noEmptyData = replaceNaN(data);
+waitbar(0.5,h);
 
-if isnumeric(data)
-    data = strcat(string(1:length(data))' ,") ", num2str(data));
-else
-    data = strcat(string(1:length(data))' ,") ", data);    
+handles.DataTable.Data = prepareDataForTable(dataFrame);
+handles.DataTable.UserData = {size(dataFrame,1), getNoEmptyDataLengths(dataFrame)};
+handles.DataTable.ColumnName = dataFrameNamesAndTypes(1,:);
+
+waitbar(0.8,h);
+
+DataTable_CellSelectionCallback(hObject, eventdata, handles);
+
+waitbar(1,h);
+close(h);
+
+
+function DataTable_CellSelectionCallback(hObject, eventdata, handles)
+
+try
+    isOneColSelected = CheckColsNumberSelected(eventdata.Indices);
+catch
+    isOneColSelected = false;
 end
 
-handles.DataList.String = data;
-handles.DataList.Value = 1;
+if isOneColSelected
+    
+    handles.DataTable.Enable = 'off';
+    
+    dataFrameLengths = handles.DataTable.UserData{2};
+    dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
 
-handles.ColTypeText.String = "Тип данных: " + dataFrameNamesAndTypes(2,colNum);
-handles.NumberLinesText.String = ...
-    "Cтрок данных: " + num2str(length(noEmptyData)) + " из " + num2str(length(data)); 
-                        
+    selectedCol = eventdata.Indices(1,2);
 
-function FilterValuePopupMenu1_Callback(hObject, eventdata, handles)
-
-DataChoosePopupMenu_Callback(hObject, eventdata, handles);
-
-
-function FilterValuePopupMenu2_Callback(hObject, eventdata, handles)
-
-DataChoosePopupMenu_Callback(hObject, eventdata, handles);
-
-
-function FilterValuePopupMenu3_Callback(hObject, eventdata, handles)
-
-DataChoosePopupMenu_Callback(hObject, eventdata, handles);
-
-
-function FilterShowCheckbox_Callback(hObject, eventdata, handles)
-
-DataChoosePopupMenu_Callback(hObject, eventdata, handles);
+    handles.TableTextInfo.String = "Число строк: " + ...
+                                    num2str(dataFrameLengths(selectedCol)) + " из " + ...
+                                    num2str(handles.DataTable.UserData{1}) + " ("   + ...
+                                    dataFrameNamesAndTypes(2,selectedCol)  + ...
+                                    " тип данных)";                            
+   
+    handles.DataTable.Enable = 'on';
+    
+else
+     handles.TableTextInfo.String = ...
+        'Для просмотра статистики столбца выберите ячейку / ячейки столбца';
+end
 
 
 function BuildButton_Callback(hObject, eventdata, handles)
