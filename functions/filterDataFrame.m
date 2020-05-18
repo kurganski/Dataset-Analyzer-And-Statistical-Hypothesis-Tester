@@ -14,16 +14,18 @@ for x = ['1', '2', '3']
     if dataFrameNamesAndTypes(2,(find(dataFrameNamesAndTypes(1,:) == filterName))) == "числовой"
         
         filterValue = eval("handles.FilterValuePopupMenu" + x + ".String");        
-        if filterValue == "" 
-            continue
-        end
         
-        if isnan(filterValue)
-            errordlg('Ошибка данных','Значения для исключения строк должны быть числовыми','modal');
+        if filterValue == ' '
+            continue
         end
         
         filterValue = strrep(filterValue,',','.');
         filterValue = str2double(filterValue);
+        
+        if isnan(filterValue)
+            errordlg('Значения для исключения строк должны быть числовыми','Ошибка данных','modal');
+            continue
+        end
         
     elseif dataFrameNamesAndTypes(2,(find(dataFrameNamesAndTypes(1,:) == filterName))) == "логический"
         filterValue = str2double(getMenuString(eval("handles.FilterValuePopupMenu" + x)));

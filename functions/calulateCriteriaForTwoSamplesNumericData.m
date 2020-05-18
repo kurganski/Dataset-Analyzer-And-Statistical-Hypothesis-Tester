@@ -5,7 +5,7 @@ infoStr = "Анализ выборок:";
 isAllNormalDistribution = false;
 
 for x = 1:size(datasets,2)
-    infoStr = [infoStr; datasets(x).name + " [ тип данных: " + datasets(x).type + "]"];
+    infoStr = [infoStr; " - " + datasets(x).name + " [ тип данных: " + datasets(x).type + "]"];
 end
 
 

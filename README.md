@@ -1,7 +1,26 @@
 Dataset Analyzer And Statistical Hypothesis Tester
 ==================================================
 
-Версия: 0.5
+Version: 0.6
+
+The application is intended for visualization and analysis of tabular data.
+
+Key Features:
+- support for xls, xlsx, csv files;
+- display of the loaded data table;
+- construction of graphs and diagrams for data analysis;
+- automatic selection and calculation of criteria for testing statistical hypotheses about the difference in samples;
+- built-in help on graphs and charts;
+- application of up to 3 filters to the analyzed data.
+
+
+System requirements:
+- Matlab 2017b and higher with the package "Statistics and Machine Learning Toolbox";
+- screen resolution 1366x768 and higher.
+
+
+
+
 
 Приложение предназначено для визуализации и анализа табличных данных.
 
@@ -10,5 +29,10 @@ Dataset Analyzer And Statistical Hypothesis Tester
 - отображение загруженной таблицы данных;
 - построение графиков и диаграмм для анализа данных;
 - автоматический подбор и расчет критериев проверки статистических гипотез о различии выборок;
+- встроенная справка по графикам и диаграммам;
 - применение до 3 фильтров к анализируемым данным.
 
+
+Системные требования:
+- Matlab 2017b и выше с пакетом "Statistics and Machine Learning Toolbox";
+- разрешение экрана 1366х768 и выше.

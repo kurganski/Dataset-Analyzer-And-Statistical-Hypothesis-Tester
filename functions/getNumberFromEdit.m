@@ -1,8 +1,8 @@
-function significanceLevel = getNumberFromEdit(handle)
+function number = getNumberFromEdit(handle)
 
-significanceLevel = handle.String;
-significanceLevel = strrep(significanceLevel,',','.');
-significanceLevel = str2double(significanceLevel);
+number = handle.String;
+number = strrep(number,',','.');
+number = str2double(number);
 
 end
 

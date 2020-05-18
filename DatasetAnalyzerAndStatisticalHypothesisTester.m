@@ -45,18 +45,21 @@ setappdata(handles.MainWindow,'graphHelpStr',graphsHelpInfos);
 % починить биноминал
 % внедрить остальные логические критерии
 % разбить критерии по кол-ву групп как на картинке
+
 % добавить таблицу сопряженности
-% anova2
 % anovan 
-% aoctool
+% gplotmatrix 
 % CROSSTAB 
-% в фридмане разобраться с репсами
-% настроить повторояющийся аннова
+% написать что строки с отсутсвующими данными отбрасываются
+% проверки выбора данных для анализа
+% справка по анове
+% не запускать фильтрацию таблицы каждый раз, если значения фильтров пустые
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function OpenCsvMenu_Callback(hObject, eventdata, handles)
+function OpenDataTable_Callback(hObject, eventdata, handles)
 
 [FileName, PathName] = uigetfile({'*.xlsx;*.xls;*.csv'}, 'Выберите файл таблицы данных');    
 if ~FileName                         
@@ -118,13 +121,44 @@ handles.FilterValuePopupMenu2.Enable = 'On';
 handles.FilterValuePopupMenu3.Enable = 'On';
 handles.DataChoosePopupMenu.Enable = 'On';
 handles.DataList.Enable = 'On';
-handles.FilterShowCheckbox.Enable = 'On';
 handles.DataTable.Visible = 'On';
+handles.SaveDataTable.Enable = 'On';
+handles.ColumnAdderMenu.Enable = 'On';
 
 waitbar(1,h);
 close(h);
 
-FilterShowCheckbox_Callback(hObject, eventdata, handles); 
+ShowAnalyzedData_Callback(hObject, eventdata, handles); 
+
+
+function ColumnAdderMenu_Callback(hObject, eventdata, handles)
+
+dataFrame = getappdata(handles.MainWindow,'dataFrame');
+dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
+
+transferData.dataFrame = dataFrame;
+transferData.dataFrameNamesAndTypes = dataFrameNamesAndTypes;
+transferData.mainWindowHandles = handles;
+
+DataSampleAdder(transferData);
+
+
+function SaveDataTable_Callback(hObject, eventdata, handles)
+
+[FileName,PathName] = uiputfile({'*.xlsx';'*.xls';'*.csv'}, ...
+    'Выберите файл для сохранения анализируемых данных');
+
+if ~FileName                         
+    return;
+end
+
+dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
+names = cellstr(dataFrameNamesAndTypes(1,:));
+
+dataFrame = getappdata(handles.MainWindow,'dataFrame');
+dataFrame = cell2table([names; table2cell(dataFrame)]);
+
+writetable(dataFrame, [PathName FileName],'FileType','spreadsheet','WriteVariableNames',0);
 
 
 function AboutMenu_Callback(hObject, eventdata, handles)
@@ -137,10 +171,11 @@ msgbox (...
     "Приложение предназначено для визуализации и анализа табличных данных.";...
     "Основные особенности:" ;...
     " - поддержка xls, xlsx, csv файлов;" ;...
-    " - построение графиков и диаграмм для анализа данных;" ;...
     " - отображение загруженной таблицы данных;" ;...
-    " - применение до 3 фильтров к анализируемым данным;" ;...
+    " - построение графиков и диаграмм для анализа данных;" ;...
     " - автоматический подбор и расчет критериев проверки статистических гипотез о различии выборок;" ;...
+    " - встроенная справка по графикам и диаграммам;" ;...
+    " - применение до 3 фильтров к анализируемым данным;" ;...
     "" ;...
     "" ;...
     "Автор: Курганский Андрей Андреевич (k-and92@mail.ru)" ;...
@@ -285,11 +320,11 @@ switch getMenuString(handles.GraphPopupmenu)
     case graphs(8)
         
         handles.ValueLevelEdit.Visible = 'On';
-        handles.ValueLevelText.Visible = 'On';
+        handles.ValueLevelText.Visible = 'On';        
+        handles.ValueLevelText.String = 'Уровень значимости:';
+        
         handles.MuEdit.Visible = 'On';
         handles.MuText.Visible = 'On';
-        
-        handles.ValueLevelText.String = 'Уровень значимости:';
         handles.MuText.String = 'Медиана / Мат. ожидание:'; 
         
         handles.GraphAdditionalPopupMenu2.Visible = 'On';
@@ -349,7 +384,13 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.GraphAdditionalPopupMenu1.String = {...
             'Выборки независимы',...
             'Выборки зависимы'....
-            };  
+            };          
+        
+        handles.MuText.Visible = 'On';
+        handles.MuText.String = 'Число повторных измерений в выборке:'; 
+        
+        handles.MuEdit.Visible = 'On';
+        handles.MuEdit.String = '1';
         
         handles.GraphAdditionalPopupMenu2.Visible = 'On';
         handles.GraphAdditionalPopupMenu2.String = {...
@@ -383,6 +424,9 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y6popupmenu.String = numericDataNames;
         handles.Y6popupmenu.Enable = 'On'; 
+        
+        handles.X1popupmenu.String = stringAndLogicalDataNames;        
+        handles.X1popupmenu.Enable = 'On'; 
         
 %     Выявление различий 1й категориальной выборки    
     case graphs(11)
@@ -529,55 +573,14 @@ else
     assert(0,"Неопределенный номер строки фильтра")    
 end
 
-eval("FilterValuePopupMenu" + handleNumber + "_Callback(hObject, eventdata, handles);");
-                
 
-function FilterValuePopupMenu1_Callback(hObject, eventdata, handles)
-
-if handles.FilterShowCheckbox.Value == 1
-    FilterShowCheckbox_Callback(hObject, eventdata, handles);    
-end
+ShowAnalyzedData_Callback(hObject, eventdata, handles);                 
 
 
-function FilterValuePopupMenu2_Callback(hObject, eventdata, handles)
+function ShowAnalyzedData_Callback(hObject, eventdata, handles)
 
-if handles.FilterShowCheckbox.Value == 1
-    FilterShowCheckbox_Callback(hObject, eventdata, handles);    
-end
-
-
-function FilterValuePopupMenu3_Callback(hObject, eventdata, handles)
-
-if handles.FilterShowCheckbox.Value == 1
-    FilterShowCheckbox_Callback(hObject, eventdata, handles);    
-end
-
-
-function FilterShowCheckbox_Callback(hObject, eventdata, handles)
-
-h = waitbar(0,'Выполняется отображение таблицы','WindowStyle','modal');
-
-dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
-dataFrame = getappdata(handles.MainWindow,'dataFrame');
-
-waitbar(0.1,h);
-
-if handles.FilterShowCheckbox.Value == 1
-    dataFrame = filterDataFrame(dataFrame, dataFrameNamesAndTypes, handles); 
-end
-
-waitbar(0.5,h);
-
-handles.DataTable.Data = prepareDataForTable(dataFrame);
-handles.DataTable.UserData = {size(dataFrame,1), getNoEmptyDataLengths(dataFrame)};
-handles.DataTable.ColumnName = dataFrameNamesAndTypes(1,:);
-
-waitbar(0.8,h);
-
-DataTable_CellSelectionCallback(hObject, eventdata, handles);
-
-waitbar(1,h);
-close(h);
+ShowAnalyzedData(handles);
+DataTable_CellSelectionCallback(0, 0, handles);
 
 
 function DataTable_CellSelectionCallback(hObject, eventdata, handles)
@@ -611,6 +614,31 @@ else
 end
 
 
+function GraphAdditionalPopupMenu1_Callback(hObject, eventdata, handles)
+
+graphs = getappdata(handles.MainWindow,'graphs');
+
+switch getMenuString(handles.GraphPopupmenu)
+    
+    case graphs(10)
+        
+        if getMenuString(handles.GraphAdditionalPopupMenu1) == 'Выборки независимы'
+            handles.X1popupmenu.Enable = 'On';     
+            
+        elseif getMenuString(handles.GraphAdditionalPopupMenu1) == 'Выборки зависимы'
+            handles.X1popupmenu.Enable = 'Off'; 
+            
+        else
+            assert(0,'некорректное значение свойства графика');   
+        end
+        
+        
+    otherwise
+        assert(0,'некорректное значение графика');
+        
+end
+
+
 function BuildButton_Callback(hObject, eventdata, handles)
 
 graphFigure = figure('Position',[50 50 800 600], 'Visible', 'off');
@@ -640,7 +668,7 @@ switch getMenuString(handles.GraphPopupmenu)
         dataNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]);
         
         if isempty(dataNames)
-            errordlg('Выберите данные для графика','Ошибка данных','modal');                    
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end
@@ -663,7 +691,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         
         if isempty(dataXNames) || isempty(dataYName)
-            errordlg('Выберите данные для графика','Ошибка данных','modal');                    
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end
@@ -682,7 +710,7 @@ switch getMenuString(handles.GraphPopupmenu)
         dataYName = getDataNames(handles, "Y1");   
         
         if isempty(dataYName)
-            errordlg('Выберите данные для графика','Ошибка данных','modal');                    
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end
@@ -711,7 +739,7 @@ switch getMenuString(handles.GraphPopupmenu)
         dataYName = getDataNames(handles, "X2");  
         
         if isempty(dataXName) || isempty(dataXName) || isempty(colorDataName)
-            errordlg('Выберите данные для графика','Ошибка данных','modal');                    
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end
@@ -724,7 +752,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         if isempty(dataX) || isempty(dataY)
             errordlg('Выбранные данные содержат пустые столбцы. Выберите другие данные',...
-                'Ошибка данных','modal');            
+                'Ошибка задания данных','modal');            
             delete(graphFigure);
             return;
         end
@@ -751,7 +779,7 @@ switch getMenuString(handles.GraphPopupmenu)
         dataYNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]); 
         
         if isempty(dataYNames)
-            errordlg('Выберите данные для графика','Ошибка данных','modal');                    
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end
@@ -778,7 +806,7 @@ switch getMenuString(handles.GraphPopupmenu)
         dataXName = getDataNames(handles, "X1");         
         
         if isempty(dataXName) || isempty(dataYName)
-            errordlg('Выберите данные для графика','Ошибка данных','modal');                    
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end         
@@ -789,7 +817,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         if isempty(dataX)
             errordlg('Выбранные данные содержат пустые столбцы. Выберите другие данные',...
-                'Ошибка данных','modal');            
+                'Ошибка задания данных','modal');            
             delete(graphFigure);
             return;
         end
@@ -808,7 +836,7 @@ switch getMenuString(handles.GraphPopupmenu)
         dataXName = getDataNames(handles, "X1"); 
         
         if isempty(dataXName) || isempty(dataYName)
-            errordlg('Выберите данные для графика','Ошибка данных','modal');                    
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end 
@@ -819,7 +847,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         if isempty(dataX)
             errordlg('Выбранные данные содержат пустые столбцы. Выберите другие данные', ...
-                'Ошибка данных','modal');            
+                'Ошибка задания данных','modal');            
             delete(graphFigure);
             return;
         end
@@ -852,7 +880,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         if isnan(significanceLevel) || significanceLevel <= 0 || significanceLevel >= 1            
             errordlg('Уровень значимости p должен быть задан числом в интервале (0...1)',...
-                'Ошибка данных','modal');                    
+                'Ошибка задания данных','modal');                    
             delete(graphFigure);
             return 
         end     
@@ -862,7 +890,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         if isempty(datasets)
             errordlg('Выбранные данные содержат пустые столбцы. Выберите другие данные', ...
-                'Ошибка данных','modal');
+                'Ошибка задания данных','modal');
             delete(graphFigure);
             return;
         end               
@@ -875,7 +903,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 
                 if isnan(mu)
                     errordlg('Общеизвестное среднее mu должно быть задано числом',...
-                        'Ошибка данных','modal');
+                        'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
                 end
@@ -893,22 +921,50 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForTwoSamplesNumericData(...
                     datasets, significanceLevel, isDatasetsRanged, isDatasetsIndependent, tail);
                 
-            case graphs(10)
+            case graphs(10)                                
+                
+                dataXName = getDataNames(handles, "X1");
+                groupData = createDatasetsForCriteria(dataFrame, dataFrameNamesAndTypes, dataXName);                
                 
                 isDatasetsIndependentStr = getMenuString(handles.GraphAdditionalPopupMenu1);
                 isDatasetsRangedStr = getMenuString(handles.GraphAdditionalPopupMenu3);
                 cmprTypeStr = getMenuString(handles.GraphAdditionalPopupMenu2);
                 
+                reps = getNumberFromEdit(handles.MuEdit);
+                
+                if isnan(reps) || reps <= 0 || round(reps) ~= reps
+                    errordlg('Число повторных измерений в выборке должно быть положительным и целым',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end
+                
+                if isempty(groupData) && size(datasets,2) < 3
+                    errordlg(['Для сбалансированного анализа дисперсий должно быть выбрано' ...
+                            'не меньше 3х уникальных выборок'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end
+                
+                if ~isempty(groupData) && size(datasets,2) ~= 1
+                    errordlg(['Для несбалансирвоанного анализа дисперсий должна быть выбрана'...
+                            'одна целевая выборка и одна разбивающая целевую на группы'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end              
+                
                 infoStr = calulateCriteriaForMultipleSamplesNumericData(...
-                    datasets, significanceLevel, isDatasetsIndependentStr, isDatasetsRangedStr, cmprTypeStr);
+                    datasets, significanceLevel, isDatasetsIndependentStr, isDatasetsRangedStr, cmprTypeStr, reps, groupData);
                 
             case graphs(11)                
                 
-                supposedProbability = getNumberFromEdit(handles.MuEdit);
+                supposedProbability = getNumberFromEdit(handles.MuEdit);                
                 
                 if isnan(supposedProbability)
                     errordlg('Предполагаемая вероятность должна быть задана числом в диапазоне (0...1)',...
-                        'Ошибка данных','modal');
+                        'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
                 end
@@ -942,5 +998,3 @@ end
         
 graphFigure.Visible = 'On';
     
-
-
