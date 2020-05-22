@@ -1,13 +1,14 @@
 Dataset Analyzer And Statistical Hypothesis Tester
 ==================================================
 
-Version: 0.6
+Version: 0.7
 
 The application is intended for visualization and analysis of tabular data.
 
 Key Features:
 - support for xls, xlsx, csv files;
 - display of the loaded data table;
+- add function of features columns;
 - construction of graphs and diagrams for data analysis;
 - automatic selection and calculation of criteria for testing statistical hypotheses about the difference in samples;
 - built-in help on graphs and charts;
@@ -27,6 +28,7 @@ System requirements:
 Основные особенности:
 - поддержка xls, xlsx, csv файлов;
 - отображение загруженной таблицы данных;
+- добавление столбцов-фич с помощью фильтров;
 - построение графиков и диаграмм для анализа данных;
 - автоматический подбор и расчет критериев проверки статистических гипотез о различии выборок;
 - встроенная справка по графикам и диаграммам;
