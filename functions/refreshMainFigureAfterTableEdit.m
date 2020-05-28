@@ -30,7 +30,12 @@ imshow(getappdata(handles.MainWindow,'HistogramIcon'),...
 handles.FilterPopupMenu1.String = ["" dataFrameNamesAndTypes(1,:)];
 handles.FilterPopupMenu2.String = ["" dataFrameNamesAndTypes(1,:)];
 handles.FilterPopupMenu3.String = ["" dataFrameNamesAndTypes(1,:)];
-handles.DataChoosePopupMenu.String = dataFrameNamesAndTypes(1,:);
+handles.FilterPopupMenu4.String = ["" dataFrameNamesAndTypes(1,:)];
+handles.FilterPopupMenu5.String = ["" dataFrameNamesAndTypes(1,:)];
+
+handles.ShowColPopupmenu1.String = dataFrameNamesAndTypes(1,:);
+handles.ShowColPopupmenu2.String = dataFrameNamesAndTypes(1,:);
+handles.ShowColPopupmenu3.String = dataFrameNamesAndTypes(1,:);
 
 end
 

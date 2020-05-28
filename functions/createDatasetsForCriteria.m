@@ -1,6 +1,6 @@
 function datasets = createDatasetsForCriteria( dataFrame, dataFrameNamesAndTypes, dataYNames )
 
-datasets = struct('dataset',{},'type',{});
+datasets = struct('dataset',{},'type',{},'name',"");
 
 for x = 1:length(dataYNames)
     

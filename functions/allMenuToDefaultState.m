@@ -36,6 +36,10 @@ handles.GraphAdditionalPopupMenu2.Value = 1;
 handles.GraphAdditionalPopupMenu2.Visible = 'Off';
 handles.GraphAdditionalPopupMenu2.String = " ";
 
+handles.GraphAdditionalPopupMenu3.Value = 1;
+handles.GraphAdditionalPopupMenu3.Visible = 'Off';
+handles.GraphAdditionalPopupMenu3.String = " ";
+
 handles.ValueLevelEdit.Visible = 'Off';
 handles.ValueLevelText.Visible = 'Off';
 handles.MuEdit.Visible = 'Off';

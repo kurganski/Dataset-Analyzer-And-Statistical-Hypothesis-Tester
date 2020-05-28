@@ -25,12 +25,7 @@ varargout{1} = handles.output;
 
 function DataSampleAdder_CloseRequestFcn(hObject, eventdata, handles)
 
-button = questdlg('Вы уверены, что хотите выйти?','','Выйти','Остаться','Остаться');
-
-if button == "Остаться" || isempty(button)
-    return;
-end
-
+qstdlg
 delete(handles.DataSampleAdder);
 
 

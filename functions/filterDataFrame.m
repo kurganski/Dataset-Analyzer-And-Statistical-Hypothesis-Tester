@@ -2,7 +2,7 @@ function dataFrame = filterDataFrame(originDataFrame, dataFrameNamesAndTypes, ha
 
 dataFrame = originDataFrame;
 
-for x = ['1', '2', '3']    
+for x = ['1', '2', '3', '4', '5']    
     
     filterName = getMenuString(eval("handles.FilterPopupMenu" + x));        
     filterEquation = getMenuString(eval("handles.EquationPopupMenu" + x));   

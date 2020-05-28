@@ -46,13 +46,10 @@ setappdata(handles.MainWindow,'graphHelpStr',graphsHelpInfos);
 % внедрить остальные логические критерии
 % разбить критерии по кол-ву групп как на картинке
 
-% добавить таблицу сопряженности
-% anovan 
+% добавить таблицу сопряженности CROSSTAB
 % gplotmatrix 
-% CROSSTAB 
 % написать что строки с отсутсвующими данными отбрасываются
 % проверки выбора данных для анализа
-% справка по анове
 % не запускать фильтрацию таблицы каждый раз, если значения фильтров пустые
 
 
@@ -104,31 +101,66 @@ handles.GraphPopupmenu.String = getappdata(handles.MainWindow,'graphs');
 handles.FilterPopupMenu1.String = ["" dataFrameNamesAndTypes(1,:)];
 handles.FilterPopupMenu2.String = ["" dataFrameNamesAndTypes(1,:)];
 handles.FilterPopupMenu3.String = ["" dataFrameNamesAndTypes(1,:)];
-handles.DataChoosePopupMenu.String = dataFrameNamesAndTypes(1,:);
+handles.FilterPopupMenu4.String = ["" dataFrameNamesAndTypes(1,:)];
+handles.FilterPopupMenu5.String = ["" dataFrameNamesAndTypes(1,:)];
+
+handles.ShowColPopupmenu1.String = dataFrameNamesAndTypes(1,:);
+handles.ShowColPopupmenu2.String = dataFrameNamesAndTypes(1,:);
+handles.ShowColPopupmenu3.String = dataFrameNamesAndTypes(1,:);
 
 GraphPopupmenu_Callback(hObject, eventdata, handles);
 
 handles.GraphPopupmenu.Enable = 'On';
 handles.BuildButton.Enable = 'On';
-handles.FilterPopupMenu1.Enable = 'On';
-handles.FilterPopupMenu2.Enable = 'On';
-handles.FilterPopupMenu3.Enable = 'On';
-handles.EquationPopupMenu1.Enable = 'On';
-handles.EquationPopupMenu2.Enable = 'On';
-handles.EquationPopupMenu3.Enable = 'On';
-handles.FilterValuePopupMenu1.Enable = 'On';
-handles.FilterValuePopupMenu2.Enable = 'On';
-handles.FilterValuePopupMenu3.Enable = 'On';
-handles.DataChoosePopupMenu.Enable = 'On';
-handles.DataList.Enable = 'On';
-handles.DataTable.Visible = 'On';
 handles.SaveDataTable.Enable = 'On';
 handles.ColumnAdderMenu.Enable = 'On';
 
-waitbar(1,h);
-close(h);
+handles.FilterPopupMenu1.Enable = 'On';
+handles.FilterPopupMenu2.Enable = 'On';
+handles.FilterPopupMenu3.Enable = 'On';
+handles.FilterPopupMenu4.Enable = 'On';
+handles.FilterPopupMenu5.Enable = 'On';
+
+handles.EquationPopupMenu1.Enable = 'On';
+handles.EquationPopupMenu2.Enable = 'On';
+handles.EquationPopupMenu3.Enable = 'On';
+handles.EquationPopupMenu4.Enable = 'On';
+handles.EquationPopupMenu5.Enable = 'On';
+
+handles.FilterValuePopupMenu1.Enable = 'On';
+handles.FilterValuePopupMenu2.Enable = 'On';
+handles.FilterValuePopupMenu3.Enable = 'On';
+handles.FilterValuePopupMenu4.Enable = 'On';
+handles.FilterValuePopupMenu5.Enable = 'On';
+
+waitbar(0.75,h);
 
 ShowAnalyzedData_Callback(hObject, eventdata, handles); 
+
+if size(dataFrameNamesAndTypes, 2) > 2
+    handles.ShowColPopupmenu1.Value = 1;
+    handles.ShowColPopupmenu2.Value = 2;
+    handles.ShowColPopupmenu3.Value = 3;
+else
+    handles.ShowColPopupmenu1.Value = 1;
+    handles.ShowColPopupmenu2.Value = 1;
+    handles.ShowColPopupmenu3.Value = 1;    
+end
+
+ShowColPopupmenu_Callback(hObject, eventdata, handles);
+
+handles.DataTable.Visible = 'On';
+
+handles.ShowColPopupmenu1.Visible = 'On';
+handles.ShowColPopupmenu2.Visible = 'On';
+handles.ShowColPopupmenu3.Visible = 'On';
+
+handles.ShowColList1.Visible = 'On';
+handles.ShowColList2.Visible = 'On';
+handles.ShowColList3.Visible = 'On';
+
+waitbar(1,h);
+close(h);
 
 
 function ColumnAdderMenu_Callback(hObject, eventdata, handles)
@@ -191,7 +223,7 @@ graphs = getappdata(handles.MainWindow,'graphs');
 graphHelpStr = getappdata(handles.MainWindow,'graphHelpStr');
 dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
 
-allDataName = ["" dataFrameNamesAndTypes(1,:)];
+allDataNames = ["" dataFrameNamesAndTypes(1,:)];
 stringDataNames = ["" dataFrameNamesAndTypes(1,dataFrameNamesAndTypes(2,:)=="категориальный")];
 numericDataNames = ["" dataFrameNamesAndTypes(1,dataFrameNamesAndTypes(2,:)=="числовой")];
 logicalDataNames = ["" dataFrameNamesAndTypes(1,dataFrameNamesAndTypes(2,:)=="логический")];
@@ -264,8 +296,8 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y1popupmenu.String = numericDataNames;
         handles.Y1popupmenu.Enable = 'On';
         
-        handles.X1popupmenu.String = allDataName;
-        handles.X2popupmenu.String = allDataName;
+        handles.X1popupmenu.String = allDataNames;
+        handles.X2popupmenu.String = allDataNames;
         handles.X1popupmenu.Enable = 'On';
         handles.X2popupmenu.Enable = 'On';      
         
@@ -387,7 +419,7 @@ switch getMenuString(handles.GraphPopupmenu)
             };          
         
         handles.MuText.Visible = 'On';
-        handles.MuText.String = 'Число повторных измерений в выборке:'; 
+        handles.MuText.String = 'Число повторов:'; 
         
         handles.MuEdit.Visible = 'On';
         handles.MuEdit.String = '1';
@@ -427,9 +459,47 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.X1popupmenu.String = stringAndLogicalDataNames;        
         handles.X1popupmenu.Enable = 'On'; 
+    
+    case graphs(11)        
+        
+        handles.Y1popupmenu.String = numericDataNames;
+        handles.Y1popupmenu.Enable = 'On';          
+        
+        handles.X1popupmenu.String = allDataNames;
+        handles.X2popupmenu.String = allDataNames;
+        handles.X3popupmenu.String = allDataNames;
+        handles.X4popupmenu.String = allDataNames;
+        handles.X5popupmenu.String = allDataNames;
+        handles.X6popupmenu.String = allDataNames;
+        
+        handles.X1popupmenu.Enable = 'On';
+        handles.X2popupmenu.Enable = 'On';
+        handles.X3popupmenu.Enable = 'On';
+        handles.X4popupmenu.Enable = 'On';
+        handles.X5popupmenu.Enable = 'On';
+        handles.X6popupmenu.Enable = 'On';  
+        
+        handles.ValueLevelEdit.Visible = 'On';
+        handles.ValueLevelText.Visible = 'On';        
+        handles.ValueLevelText.String = 'Уровень значимости:'; 
+        
+        handles.GraphAdditionalPopupMenu1.Visible = 'On';
+        handles.GraphAdditionalPopupMenu1.String = {'Тип суммы квадратов: I',...
+                                                    'Тип суммы квадратов: II',...
+                                                    'Тип суммы квадратов: III',...
+                                                    };
+        
+        handles.GraphAdditionalPopupMenu2.Visible = 'On';
+        handles.GraphAdditionalPopupMenu2.String = {...
+            'Сравнение: Тьюки-Крамера',...
+            'Сравнение: Бонферрони',....
+            'Сравнение: Данна-Сидака',....
+            'Сравнение: Фишера (LSD)',....
+            'Сравнение: Шеффи'....
+            };
         
 %     Выявление различий 1й категориальной выборки    
-    case graphs(11)
+    case graphs(12)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -437,7 +507,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.MuEdit.Visible = 'On';
         handles.MuText.Visible = 'On';
-        handles.MuText.String = 'Предполагаемая вероят-ть "0":';       
+        handles.MuText.String = 'Вероят-ть "0":';       
         
         handles.GraphAdditionalPopupMenu2.Visible = 'On';
         handles.GraphAdditionalPopupMenu2.String = {...
@@ -449,7 +519,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y1popupmenu.String = logicalDataNames;        
         handles.Y1popupmenu.Enable = 'On';
     
-    case graphs(12)
+    case graphs(13)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -457,7 +527,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.MuEdit.Visible = 'On';
         handles.MuText.Visible = 'On';
-        handles.MuText.String = 'Предполагаемая вероят-ть "+":';
+        handles.MuText.String = 'Вероят-ть "+":';
         
         handles.GraphAdditionalPopupMenu1.Visible = 'On';
         handles.GraphAdditionalPopupMenu1.String = {...
@@ -478,7 +548,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y2popupmenu.String = stringAndLogicalDataNames;
         handles.Y2popupmenu.Enable = 'On'; 
     
-    case graphs(13)
+    case graphs(14)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -486,7 +556,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.MuEdit.Visible = 'On';
         handles.MuText.Visible = 'On';
-        handles.MuText.String = 'Предполагаемая вероят-ть "+":';
+        handles.MuText.String = 'Вероят-ть "+":';
         
         handles.GraphAdditionalPopupMenu1.Visible = 'On';
         handles.GraphAdditionalPopupMenu1.String = {...
@@ -518,7 +588,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y6popupmenu.String = stringAndLogicalDataNames;
         handles.Y6popupmenu.Enable = 'On'; 
-    
+        
     otherwise
         
         assert(0,'некорректное значение графика');
@@ -536,6 +606,10 @@ elseif hObject == handles.FilterPopupMenu2
     handleNumber = "2";
 elseif hObject == handles.FilterPopupMenu3    
     handleNumber = "3";
+elseif hObject == handles.FilterPopupMenu4        
+    handleNumber = "4";
+elseif hObject == handles.FilterPopupMenu5    
+    handleNumber = "5";
 else
     assert(0,"Неопределенный указатель фильтра данных")
 end
@@ -634,9 +708,64 @@ switch getMenuString(handles.GraphPopupmenu)
         
         
     otherwise
-        assert(0,'некорректное значение графика');
         
 end
+
+
+function ShowColPopupmenu_Callback(hObject, eventdata, handles)
+
+switch hObject
+    
+    case handles.ShowColPopupmenu1
+        
+        values = handles.ShowColPopupmenu1.Value;
+        listHandles = handles.ShowColList1;
+        
+    case handles.ShowColPopupmenu2
+        
+        values = handles.ShowColPopupmenu2.Value;
+        listHandles = handles.ShowColList2;
+        
+    case handles.ShowColPopupmenu3
+        
+        values = handles.ShowColPopupmenu3.Value;
+        listHandles = handles.ShowColList3;
+        
+    case handles.OpenDataTable
+        
+        values = [  handles.ShowColPopupmenu1.Value...
+                    handles.ShowColPopupmenu2.Value ...
+                    handles.ShowColPopupmenu3.Value] ;
+                
+        listHandles = [ handles.ShowColList1 handles.ShowColList2 handles.ShowColList3 ];
+        
+    otherwise
+        assert(0, 'Вызов из расшаренного callback');
+end
+        
+cellData = handles.DataTable.Data;
+
+numbers = 1:size(cellData,1);
+
+for x = 1:length(values)
+    
+    data = string(cell2mat(cellData(:,values(x))));
+    data(ismissing(data)) = " ";
+    listHandles(x).String = strcat(num2str(numbers'), ") ", data);    
+end
+    
+
+function ShowColList_Callback(hObject, eventdata, handles)
+
+handles.ShowColList1.Value = hObject.Value;
+handles.ShowColList2.Value = hObject.Value;
+handles.ShowColList3.Value = hObject.Value;
+
+
+function RussianLangMenu_Callback(hObject, eventdata, handles)
+
+
+function EnglishLangMenu_Callback(hObject, eventdata, handles)
 
 
 function BuildButton_Callback(hObject, eventdata, handles)
@@ -687,8 +816,7 @@ switch getMenuString(handles.GraphPopupmenu)
         hold on;
         
         dataYName = getDataNames(handles, "Y1");
-        dataXNames = getDataNames(handles, ["X1","X2","X3","X4","X5","X6"]);
-        
+        dataXNames = getDataNames(handles, ["X1","X2","X3","X4","X5","X6"]);        
         
         if isempty(dataXNames) || isempty(dataYName)
             errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
@@ -879,7 +1007,7 @@ switch getMenuString(handles.GraphPopupmenu)
         significanceLevel = getNumberFromEdit(handles.ValueLevelEdit);        
         
         if isnan(significanceLevel) || significanceLevel <= 0 || significanceLevel >= 1            
-            errordlg('Уровень значимости p должен быть задан числом в интервале (0...1)',...
+            errordlg('Уровень значимости должен быть задан числом в интервале (0...1)',...
                 'Ошибка задания данных','modal');                    
             delete(graphFigure);
             return 
@@ -957,8 +1085,46 @@ switch getMenuString(handles.GraphPopupmenu)
                 
                 infoStr = calulateCriteriaForMultipleSamplesNumericData(...
                     datasets, significanceLevel, isDatasetsIndependentStr, isDatasetsRangedStr, cmprTypeStr, reps, groupData);
+            
                 
-            case graphs(11)                
+            case graphs(11)
+                
+                significanceLevel = getNumberFromEdit(handles.ValueLevelEdit);
+                
+                if isnan(significanceLevel) || significanceLevel <= 0 || significanceLevel >= 1
+                    errordlg('Уровень значимости должен быть задан числом в интервале (0...1)',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end
+                
+                sstypeStr = getMenuString(handles.GraphAdditionalPopupMenu1);
+                cmprTypeStr = getMenuString(handles.GraphAdditionalPopupMenu2);
+                
+                dataYName = getDataNames(handles, "Y1");
+                dataXNames = getDataNames(handles, ["X1","X2","X3","X4","X5","X6"]);
+                
+                if any(dataXNames == dataYName)
+                    errordlg('Выберите целевую переменную отличную от исходных',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end
+                
+                if size(dataXNames,2) < 2 || isempty(dataYName)
+                    errordlg('Выберите целевую переменную и 2 или более уникальных исходных',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end
+                
+                dataY = createDatasetsForCriteria(dataFrame, dataFrameNamesAndTypes, dataYName);
+                datasets = createDatasetsForCriteria(dataFrame, dataFrameNamesAndTypes, dataXNames);
+                
+                infoStr = calulateAnovan(dataY, datasets, sstypeStr, significanceLevel, cmprTypeStr);
+                printInfo(graphFigure, infoStr);
+                
+            case graphs(12)                
                 
                 supposedProbability = getNumberFromEdit(handles.MuEdit);                
                 
@@ -972,7 +1138,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForOneSampleCategoricalData(...
                     datasets, significanceLevel, supposedProbability, tail);
                 
-            case graphs(12)
+            case graphs(13)
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                 isDatasetsSmall = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3) );
@@ -980,7 +1146,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForTwoSamplesCategoricalData(...
                     datasets, significanceLevel, isDatasetsSmall, isDatasetsIndependent, tail);
                 
-            case graphs(13)
+            case graphs(14)
                 
                 isDatasetsSmall = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3) );
                 
@@ -989,8 +1155,8 @@ switch getMenuString(handles.GraphPopupmenu)
                 
         end               
         
-        printInfo(graphFigure, infoStr);   
-        
+        printInfo(graphFigure, infoStr); 
+                
     otherwise
         
         assert(0,'некорректное значение графика');       
