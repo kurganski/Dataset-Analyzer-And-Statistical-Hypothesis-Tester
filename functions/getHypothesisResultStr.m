@@ -1,7 +1,7 @@
 function HypothesisResultStr = getHypothesisResultStr(h)
 
 if h
-   HypothesisResultStr = "отвергнута"; 
+   HypothesisResultStr = "отклонена"; 
 else
     HypothesisResultStr = "подтверждена"; 
 end

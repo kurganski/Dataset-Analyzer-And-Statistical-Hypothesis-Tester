@@ -2,11 +2,11 @@ function typedDataSample = setSampleType( dataSample, sampleType )
 
 switch sampleType
     
-    case "категориальный"
+    case "номинативный"
         
         typedDataSample = dataSample;
         
-    case {"логический", "числовой"}
+    case  {"дихотомический","непрерывный"}
         
         typedDataSample = str2double(dataSample);      
         

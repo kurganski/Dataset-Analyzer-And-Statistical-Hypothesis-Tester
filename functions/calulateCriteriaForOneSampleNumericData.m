@@ -32,7 +32,6 @@ if isNormalDistribution
         infoStr = [infoStr; "Число степеней свободы: " + num2str(stats.df)];
         infoStr = [infoStr; "Расчетное ско выборки: " + num2str(stats.sd)];
         infoStr = [infoStr; "Доверительный интервал: " + num2str(ci(1)) + "..." + num2str(ci(2))];
-        infoStr = addPvalueReference(infoStr, p); 
         
     else
         infoStr = [infoStr; "Выборка распределена не нормально (по критерию Андерсона-Дарлинга)"];
@@ -48,7 +47,6 @@ if isNormalDistribution
         infoStr = [infoStr; "p-значение: " + num2str(p)];
         infoStr = [infoStr; "Значение критерия: " + num2str(stats.sign)];
         infoStr = [infoStr; "Значение z-критерия: " + num2str(stats.zval)];
-        infoStr = addPvalueReference(infoStr, p);         
         
 end
 end

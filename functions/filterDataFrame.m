@@ -11,7 +11,7 @@ for x = ['1', '2', '3', '4', '5']
         continue
     end
     
-    if dataFrameNamesAndTypes(2,(find(dataFrameNamesAndTypes(1,:) == filterName))) == "числовой"
+    if dataFrameNamesAndTypes(2,(find(dataFrameNamesAndTypes(1,:) == filterName))) == "непрерывный"
         
         filterValue = eval("handles.FilterValuePopupMenu" + x + ".String");        
         
@@ -27,10 +27,10 @@ for x = ['1', '2', '3', '4', '5']
             continue
         end
         
-    elseif dataFrameNamesAndTypes(2,(find(dataFrameNamesAndTypes(1,:) == filterName))) == "логический"
+    elseif dataFrameNamesAndTypes(2,(find(dataFrameNamesAndTypes(1,:) == filterName))) == "дихотомический"
         filterValue = str2double(getMenuString(eval("handles.FilterValuePopupMenu" + x)));
         
-    elseif dataFrameNamesAndTypes(2,(find(dataFrameNamesAndTypes(1,:) == filterName))) == "категориальный"
+    elseif dataFrameNamesAndTypes(2,(find(dataFrameNamesAndTypes(1,:) == filterName))) == "номинативный"
         filterValue = getMenuString(eval("handles.FilterValuePopupMenu" + x));
         
     else

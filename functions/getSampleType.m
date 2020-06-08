@@ -7,15 +7,15 @@ dataSample = str2double(dataSample);
 
 % если строчный тип, то появятся NaN, тогда просто вставляем исходный столбец
 if any(isnan(dataSample))
-    sampleType = "категориальный";
+    sampleType = "номинативный";
     return
 end
 
 % проверяем на логический массив
 if all(ismember(unique(dataSample), [0,1,Inf]))
-    sampleType = "логический";
+    sampleType = "дихотомический";
 else
-    sampleType = "числовой";
+    sampleType = "непрерывный";
 end
 
 end

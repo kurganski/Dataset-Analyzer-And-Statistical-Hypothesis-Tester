@@ -31,7 +31,7 @@ if button == "Остаться" || isempty(button)
     return;
 end
 
-delete(handles.DataSampleAdder);
+delete(gcf);
 
 
 function DataSampleAdder_OpeningFcn(hObject, eventdata, handles, varargin)
@@ -102,14 +102,20 @@ close(h);
 function DataTable_CellSelectionCallback(hObject, eventdata, handles)
 
 try
-    isOneColSelected = CheckColsNumberSelected(eventdata.Indices);
+    isOneColSelected = CheckColsNumberSelected(eventdata.Indices);    
+    
 catch
     isOneColSelected = false;
 end
 
-if isOneColSelected && eventdata.Indices(2) >= length(handles.ColumnNamePopupMenu.String)
-    handles.DeleteColumnButton.Enable = 'on';
-    handles.DeleteColumnButton.UserData = eventdata.Indices(2);
+if  isOneColSelected && eventdata.Indices(2) >= length(handles.ColumnNamePopupMenu.String)
+
+    dataFrameNamesAndTypes = getappdata(handles.DataSampleAdder,'dataFrameNamesAndTypes');
+    
+    if ~isempty(dataFrameNamesAndTypes)
+        handles.DeleteColumnButton.Enable = 'on';
+        handles.DeleteColumnButton.UserData = eventdata.Indices(2);
+    end
 else
     handles.DeleteColumnButton.Enable = 'off';
     handles.DeleteColumnButton.UserData = [];
@@ -130,10 +136,15 @@ if handles.ColumnNamePopupMenu.Value == 1
     handles.ValueMenuEdit.String = "";
     handles.EquationPopupMenu.String = "";
     handles.ColumnStatisticsText.String = "";
+    
+    handles.AddToTableButton.Enable = 'off';
+    handles.ApplyButton.Enable = 'off';
+    handles.CopyButton.Enable = 'off';
+    
     return
     
-elseif dataFrameNamesAndTypes(2, selectedCol) == "категориальный" || ...
-        dataFrameNamesAndTypes(2, selectedCol) == "логический"
+elseif dataFrameNamesAndTypes(2, selectedCol) == "номинативный" || ...
+        dataFrameNamesAndTypes(2, selectedCol) == "дихотомический"
     
     dataName = getMenuString(handles.ColumnNamePopupMenu);
     data = dataFrame{:,find(dataFrameNamesAndTypes(1,:)==dataName)};
@@ -146,7 +157,7 @@ elseif dataFrameNamesAndTypes(2, selectedCol) == "категориальный" || ...
         
     handles.EquationPopupMenu.String = {'=='; '~='};    
 
-elseif dataFrameNamesAndTypes(2, selectedCol) == "числовой"  
+elseif dataFrameNamesAndTypes(2, selectedCol) == "непрерывный"  
     
     handles.ValueMenuEdit.String = ' ';
     handles.ValueMenuEdit.Style = 'edit';
@@ -159,12 +170,36 @@ end
 
 dataFrameLengths = handles.DataTable.UserData{2};
 
+handles.AddToTableButton.Enable = 'on';
+handles.ApplyButton.Enable = 'on';
+handles.CopyButton.Enable = 'on';
+
 handles.ColumnStatisticsText.String = "Число строк: " + ...
                 num2str(dataFrameLengths(selectedCol)) + " из " + ...
                 num2str(handles.DataTable.UserData{1}) + " ("   + ...
                 dataFrameNamesAndTypes(2,selectedCol)  + ...
                 " тип данных)";
-            
+
+                      
+function CopyButton_Callback(hObject, eventdata, handles)
+
+dataFrame = getappdata(handles.DataSampleAdder,'dataFrame');
+
+selectedCol = handles.ColumnNamePopupMenu.Value-1;
+newColumn = string(dataFrame{:,selectedCol});
+
+handles.DataSampleList.UserData = newColumn;
+
+numbers = 1:length(newColumn);
+handles.DataSampleList.String = strcat(num2str(numbers'), ") ", newColumn);
+
+newColumnSampleType = getSampleType( newColumn );
+
+handles.NewColumnStatisticsText.String = "Число строк: " + ...
+                num2str(length(replaceNaN(newColumn))) + " из " + ...
+                num2str(length(newColumn)) + " ("   + ...
+                newColumnSampleType  + " тип данных)";
+
             
 function ApplyButton_Callback(hObject, eventdata, handles)
 
@@ -224,12 +259,16 @@ setappdata(handles.DataSampleAdder, 'dataFrameNamesAndTypes', dataFrameNamesAndT
 
 AdderShowAnalyzedData(handles);      
 
+handles.SaveAndExitButton.Enable = 'on';
+
 
 function DeleteColumnButton_Callback(hObject, eventdata, handles)
 
 colToDelete = handles.DeleteColumnButton.UserData;
+dataFrameNamesAndTypes = getappdata(handles.DataSampleAdder,'dataFrameNamesAndTypes');
 
-if isempty(colToDelete)
+
+if isempty(colToDelete)     
     return
 end
 
@@ -243,6 +282,12 @@ setappdata(handles.DataSampleAdder, 'dataFrame', dataFrame);
 setappdata(handles.DataSampleAdder, 'dataFrameNamesAndTypes', dataFrameNamesAndTypes);
 
 AdderShowAnalyzedData(handles);  
+
+if size(dataFrame,2) >= length(handles.ColumnNamePopupMenu.String)
+    handles.SaveAndExitButton.Enable = 'on';
+else
+    handles.SaveAndExitButton.Enable = 'off';    
+end
 
 
 function SaveAndExitButton_Callback(hObject, eventdata, handles)

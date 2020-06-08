@@ -1,3 +1,8 @@
 function menuString = getMenuString(menuHandle) 
 
-menuString = string(menuHandle.String(menuHandle.Value));
+if isempty(menuHandle.String)
+    menuString = [];
+else
+    menuString = string(menuHandle.String(menuHandle.Value));    
+end
+

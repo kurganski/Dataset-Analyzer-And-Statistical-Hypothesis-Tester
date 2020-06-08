@@ -3,7 +3,7 @@ function changedColumn = applyNewValueToSample(handles, newColumn, filteredCol, 
 changedColumn = [];
 filterEquation = getMenuString(handles.EquationPopupMenu);
 
-if sampleType == "числовой"
+if sampleType == "непрерывный"
     
     filterValue = handles.ValueMenuEdit.String;
     
@@ -19,10 +19,10 @@ if sampleType == "числовой"
         return
     end
     
-elseif sampleType == "логический"
+elseif sampleType == "дихотомический"
     filterValue = str2double(getMenuString(handles.ValueMenuEdit));
     
-elseif sampleType == "категориальный"
+elseif sampleType == "номинативный"
     filterValue = getMenuString(handles.ValueMenuEdit);
     
 else

@@ -19,7 +19,7 @@ groupingVarsNames = cell(1, size(datasets,2));
 
 for x = 1:size(datasets,2)
     
-    if datasets(x).type == 'числовой' 
+    if datasets(x).type == 'непрерывный' 
         continuousVars(x) = x;   
     end
     
