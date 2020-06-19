@@ -10,7 +10,6 @@ end
 
 infoStr = [infoStr; ""];
 infoStr = [infoStr; "Уровень значимости: " + num2str(significanceLevel)];
-infoStr = [infoStr; "Тип гипотезы: " + tailStr];
 infoStr = [infoStr; ""];
 
 tail = getDictValue(tailStr);
@@ -18,14 +17,19 @@ tail = getDictValue(tailStr);
 
 if isDatasetsIndependent
     
-    if isDichotomousDatasetsLarge(datasets)    
+    infoStr = [infoStr; "Выборки независимы"];
+    infoStr = [infoStr; ""];
+    
+    if isDichotomousIndependentDatasetsLarge(datasets)    
         
         infoStr = [infoStr; "Выборки большие"];
+        infoStr = [infoStr; ""];
         
-        [h,p,ci,zval] = ztest2(datasets, significanceLevel, tailStr);
+        [h,p,ci,zval] = ztest2(datasets, significanceLevel, tail);
         
         infoStr = [infoStr; "Примененный критерий: двухвыборочный z-критерий с поправкой Йейтса (two-sample z-Test)"];
-        infoStr = [infoStr; "Нулевая гипотеза: выборки имеют независимые нормальные распределения с одинаковыми МО и одинаковыми неизвестными дисперсиями: " + getHypothesisResultStr(h)];
+        infoStr = [infoStr; "Нулевая гипотеза: выборки не имеют неслучайных зависимостей: " + getHypothesisResultStr(h)];
+        infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
         infoStr = [infoStr; "Описание метода см. в Медико-биологическая статистика. С.Гланц. Практика, М. 1998 - 459 с."];
         infoStr = [infoStr; ""];
         
@@ -37,20 +41,20 @@ if isDatasetsIndependent
     
     else
         
-        infoStr = [infoStr; "Одна или более выборок малы"];
+        infoStr = [infoStr; "Одна или более выборок малы"];        
         
-        [h,p,ci,stats] = fisherExactTest(datasets, significanceLevel, tailStr);
+        [h,p,stats] = fishertest(crosstab(datasets(1).dataset,datasets(2).dataset), 'Alpha', significanceLevel, 'Tail',tail);
         
         infoStr = [infoStr; "Примененный критерий: двухвыборочный точный критерий Фишера (two-sample Fisher's exact Test)"];
-        infoStr = [infoStr; "Нулевая гипотеза: выборки имеют независимые нормальные распределения с одинаковыми МО и одинаковыми неизвестными дисперсиями: " + getHypothesisResultStr(h)];
-        infoStr = [infoStr; "Описание метода см. в Медико-биологическая статистика. С.Гланц. Практика, М. 1998 - 459 с."];
+        infoStr = [infoStr; "Нулевая гипотеза: выборки не имеют неслучайных зависимостей: " + getHypothesisResultStr(h)];
+        infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
+        infoStr = [infoStr; "Описание метода: https://www.mathworks.com/help/stats/fishertest.html"];
         infoStr = [infoStr; ""];
         
         infoStr = [infoStr; "p-значение: " + num2str(p)];
-        infoStr = [infoStr; "Значение критерия: " + num2str(stats.tstat)];
-        infoStr = [infoStr; "Число степеней свободы: " + num2str(stats.df)];
-        infoStr = [infoStr; "Расчетное ско разности выборок: " + num2str(stats.sd)];
-        infoStr = [infoStr; "Доверительный интервал: " + num2str(ci(1)) + "..." + num2str(ci(2))];
+        infoStr = [infoStr; "Величина связи выборок: " + num2str(stats.OddsRatio)];
+        infoStr = [infoStr; "Асимптотические доверительный интервал для отношения шансов: " ...
+            + num2str(stats.ConfidenceInterval(1)) + "..." + num2str(stats.ConfidenceInterval(2))];
     end  
     
 else
@@ -58,18 +62,24 @@ else
     infoStr = [infoStr; "Выборки зависимы"];
     infoStr = [infoStr; ""];
     
-    [h,p,ci,stats] = macnimar2(datasets, 'Alpha', significanceLevel, 'Tail', tail);
+    [h,p,chi2] = mcnemar2(datasets, significanceLevel, 'Edwards');
     
-    infoStr = [infoStr; "Примененный критерий: двухвыборочный критерий Стьюдента (two-sample t-Test)"];
-    infoStr = [infoStr; "Нулевая гипотеза: выборки имеют независимые нормальные распределения с одинаковыми МО и одинаковыми неизвестными дисперсиями: " + getHypothesisResultStr(h)];
-    infoStr = [infoStr; "Функция в Matlab R2017a: ttest2(x, y, alpha)"];
+    infoStr = [infoStr; "Примененный критерий: критерий МакНимара с поправкой Эдвардса (McNiemar’s test)"];
+    infoStr = [infoStr; "Нулевая гипотеза: выборки не имеют неслучайных зависимостей: " + getHypothesisResultStr(h)];
     infoStr = [infoStr; ""];
     
     infoStr = [infoStr; "p-значение: " + num2str(p)];
-    infoStr = [infoStr; "Значение критерия: " + num2str(stats.tstat)];
-    infoStr = [infoStr; "Число степеней свободы: " + num2str(stats.df)];
-    infoStr = [infoStr; "Расчетное ско разности выборок: " + num2str(stats.sd)];
-    infoStr = [infoStr; "Доверительный интервал: " + num2str(ci(1)) + "..." + num2str(ci(2))];
+    infoStr = [infoStr; "Хи-квадрат: " + num2str(chi2)];
+    
+    infoStr = [infoStr; ""];
+    [h,p,chi2] = mcnemar2(datasets, significanceLevel, 'Yates');
+    
+    infoStr = [infoStr; "Примененный критерий: критерий МакНимара с поправкой Йейтса (McNiemar’s test)"];
+    infoStr = [infoStr; "Нулевая гипотеза: выборки не имеют неслучайных зависимостей: " + getHypothesisResultStr(h)];
+    infoStr = [infoStr; ""];
+    
+    infoStr = [infoStr; "p-значение: " + num2str(p)];
+    infoStr = [infoStr; "Хи-квадрат: " + num2str(chi2)];
     
 end
 

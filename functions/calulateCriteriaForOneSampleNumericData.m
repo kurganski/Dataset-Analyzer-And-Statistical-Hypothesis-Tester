@@ -11,7 +11,6 @@ end
 
 infoStr = [infoStr; ""];
 infoStr = [infoStr; "Уровень значимости: " + num2str(significanceLevel)];
-infoStr = [infoStr; "Тип гипотезы: " + tailStr];
 
 tail = getDictValue(tailStr);
 
@@ -24,6 +23,7 @@ if isNormalDistribution
         infoStr = [infoStr; ""];
         infoStr = [infoStr; "Примененный критерий: одновыборочный критерий Стьюдента (one-sample t-Test)"];
         infoStr = [infoStr; "Нулевая гипотеза: выборка имеет нормальное распределение с неизвестной дисперсией и мат. ожиданием " + num2str(mu) + ": " + getHypothesisResultStr(h)];
+        infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
         infoStr = [infoStr; "Функция в Matlab R2017a: ttest(x, mu, alpha)"];
         infoStr = [infoStr; ""];
              
@@ -41,6 +41,7 @@ if isNormalDistribution
         infoStr = [infoStr; ""];
         infoStr = [infoStr; "Примененный критерий: критерий знаков (sign test)"];
         infoStr = [infoStr; "Нулевая гипотеза: выборка имеет непрерывное распределение с медианой " + num2str(mu) + ": " + getHypothesisResultStr(h)];
+        infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
         infoStr = [infoStr; "Функция в Matlab R2017a: signtest(x, mu, alpha)"];
         infoStr = [infoStr; ""];
         

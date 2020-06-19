@@ -1,4 +1,4 @@
-function [h,p,ci,zval] = ztest2( datasets, alpha, tailStr )
+function [h,p,ci,zval] = ztest2( datasets, alpha, tail )
 
 data1 = replaceNaN(datasets(1).dataset);
 data2 = replaceNaN(datasets(2).dataset);
@@ -18,8 +18,6 @@ zval = (abs(p1 - p2) - 0.5*(1/n1 + 1/n2) ) / ser;
 
 % Compute the correct p-value for the test, and confidence intervals
 % if requested.
-
-tail = getDictValue(tailStr);
 
 if tail == "both" % two-tailed test
     p = 2 * normcdf(-abs(zval),0,1);

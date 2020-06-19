@@ -1,7 +1,11 @@
 function HypothesisResultStr = getHypothesisResultStr(h)
 
-if h
-   HypothesisResultStr = "отклонена"; 
+if isnan(h)
+    HypothesisResultStr = "не удалось вычислить критерий";    
 else
-    HypothesisResultStr = "подтверждена"; 
+    if h
+        HypothesisResultStr = "отклонена";
+    else
+        HypothesisResultStr = "подтверждена";
+    end
 end

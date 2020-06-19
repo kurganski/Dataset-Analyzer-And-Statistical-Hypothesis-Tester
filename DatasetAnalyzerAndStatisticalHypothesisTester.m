@@ -42,15 +42,21 @@ setappdata(handles.MainWindow,'graphHelpStr',graphsHelpInfos);
 
 
 % TODO: 
-% починить биноминал
-% внедрить остальные логические критерии
+% точный макнемара сделать
+% 3 и более номинативные добавить хи квадрат
 
 % добавить таблицу сопряженности CROSSTAB
 % gplotmatrix 
+% mosaic plot
+% boxplot
 % проверки выбора данных для анализа
+% описать какие конкретно версии точных критериев применяются
+
 % не запускать фильтрацию таблицы каждый раз, если значения фильтров пустые
+
 % если удалили модальное окно загрузки - не выкидывать ошибку
-% подмумать над тем, чтоб убрать выбор хвостов для критериев
+
+% добавить хвосты и доверительные инервалы для дихотомиеских критериев
 
 % типов выборок и количество уникальных категорий??  - уникальные значения
 % должны совпадать
@@ -87,17 +93,25 @@ try
     end
     
     waitbar(0.5,h);
+    [dataFrame, dataFrameNamesAndTypes] = setTableFieldsTypes(T);
     
 catch
     close(h);
-    errordlg({'Невозможно прочитать данные.';...
-        'Убедитесь, что файл имеет расширение "xlsx", "xls" или "csv",';...
-        'а данные представлены в виде двухмерной таблицы без вложенных столбцов'},...
-        'Ошибка открытия файла','modal');
+    errordlg({'Не удалось прочитать данные.';...
+        'Файл должен иметь расширение "xlsx", "xls" или "csv",';...
+        'а данные должен быть представлены в виде двухмерной таблицы без вложенных столбцов/строк.'},...
+        'Ошибка чтения файла','modal');
     return;
 end
 
-[dataFrame, dataFrameNamesAndTypes] = setTableFieldsTypes(T);
+if length(unique(dataFrameNamesAndTypes(1,:))) ~= length(dataFrameNamesAndTypes(1,:))
+    close(h);
+    errordlg({'Не удалось прочитать данные.';...
+        'Имена столбцов должны быть уникальными.'},...
+        'Ошибка чтения файла','modal');
+    return;    
+end
+
 setappdata(handles.MainWindow,'dataFrame',dataFrame);
 setappdata(handles.MainWindow,'dataFrameNamesAndTypes',dataFrameNamesAndTypes);
 
@@ -552,14 +566,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.GraphAdditionalPopupMenu1.String = {...
             'Выборки независимы',...
             'Выборки зависимы'...
-            };                
-        
-        handles.GraphAdditionalPopupMenu2.Visible = 'On';
-        handles.GraphAdditionalPopupMenu2.String = {...
-            'Двусторонняя альтернативная гипотеза',...
-            'Левосторонняя альтернативная гипотеза',...
-            'Правосторонняя альтернативная гипотеза'...
-            };        
+            };    
         
         handles.Y1popupmenu.String = logicalDataNames;        
         handles.Y1popupmenu.Enable = 'On';
@@ -1029,7 +1036,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         
     %   Выявления различий
-    case {graphs{8}, graphs{9}, graphs{10}, graphs{12}, graphs{13}, graphs{14} }   
+    case {graphs{8}, graphs{9}, graphs{10}, graphs{12}, graphs{13}, graphs{14}, graphs{15}  }   
         
         dataYNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]); 
         
@@ -1132,28 +1139,46 @@ switch getMenuString(handles.GraphPopupmenu)
             case graphs(13)
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
-                datasets(1).dataset = replaceNaN(datasets(1).dataset);
-                datasets(2).dataset = replaceNaN(datasets(2).dataset);
+                
+                data = replaceNanStrings([datasets(1).dataset, datasets(2).dataset]);
+                datasets(1).dataset = data(:,1);
+                datasets(2).dataset = data(:,2);
                 
                 infoStr = calulateCriteriaForTwoSamplesDichotomousData(...
                     datasets, significanceLevel, isDatasetsIndependent, tailStr);
                 
-            case graphs(14)
+            case graphs(14)                
+                
+                isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
+                              
+                if size(datasets,2) < 3
+                    errordlg(' Выберите не меньше 3х уникальных выборок',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end
                 
                 infoStr = calulateCriteriaForMultipleSamplesDichotomousData(...
-                    datasets, significanceLevel, tailStr);
+                    datasets, significanceLevel, isDatasetsIndependent);
                 
             case graphs(15)
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
+                    
+                if size(datasets,2) ~= 2
+                    errordlg(' Выберите 2 уникальные выборки',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end
                 
                 infoStr = calulateCriteriaForTwoSamplesCategoricalData(...
-                    datasets, significanceLevel, isDatasetsIndependent, tailStr);
+                    datasets, significanceLevel, isDatasetsIndependent);
                 
             case graphs(16)
                 
                 infoStr = calulateCriteriaForMultipleSamplesCategoricalData(...
-                    datasets, significanceLevel, tailStr);
+                    datasets, significanceLevel);
                 
         end               
         

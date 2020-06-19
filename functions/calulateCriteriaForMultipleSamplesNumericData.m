@@ -43,11 +43,13 @@ setFigureInCenter(handle);
 
 if isDatasetsIndependent
       
+    infoStr = [infoStr; "Выборки независимы"];
     infoStr = [infoStr; ""];
     
     if isAllNormalDistribution
         
-        infoStr = [infoStr; "Все выборки распределены нормально (по критерию Андерсона-Дарлинга)"];        
+        infoStr = [infoStr; "Все выборки распределены нормально (по критерию Андерсона-Дарлинга)"];  
+        infoStr = [infoStr; ""];
         
         if isempty(groupData)
             [~,~,stats] = anova1(replaceNanStrings(dataForAnova));
@@ -78,6 +80,7 @@ if isDatasetsIndependent
         
     else
         infoStr = [infoStr; "Не все выборки распределены нормально (по критерию Андерсона-Дарлинга)"];
+        infoStr = [infoStr; ""];
         
         if isempty(groupData)
             [~,~,stats] = kruskalwallis(replaceNanStrings(dataForAnova));
@@ -110,11 +113,13 @@ if isDatasetsIndependent
     
 else
     
-    infoStr = [infoStr; ""];    
+    infoStr = [infoStr; "Выборки зависимы"];
+    infoStr = [infoStr; ""];   
     
     if isAllNormalDistribution
         
         infoStr = [infoStr; "Все выборки распределены нормально (по критерию Андерсона-Дарлинга)"];
+        infoStr = [infoStr; ""];
                     
         [~,~,stats] = ranova1(replaceNanStrings(dataForAnova)); 
         

@@ -1,5 +1,5 @@
 function infoStr = calulateCriteriaForTwoSamplesCategoricalData( ...
-                                datasets, significanceLevel, isDatasetsIndependent, tailStr )
+                                datasets, significanceLevel, isDatasetsIndependent )
 
 infoStr = "Анализ выборок:";
 
@@ -7,63 +7,36 @@ for x = 1:size(datasets,2)
     infoStr = [infoStr; " - " + datasets(x).name + " [ тип данных: " + datasets(x).type + "]"];
 end
 
-
 infoStr = [infoStr; ""];
 infoStr = [infoStr; "Уровень значимости: " + num2str(significanceLevel)];
-infoStr = [infoStr; "Тип гипотезы: " + tailStr];
+infoStr = [infoStr; ""];
 
-tail = getDictValue(tailStr);
-
-
-if isDatasetsIndependenta
+if isDatasetsIndependent   
     
-    if isDatasetsSmall(datasets)        
-        
-        [h,p,ci,stats] = fisherExactTest(datasets, 'Alpha', significanceLevel, 'Tail', tail);
-        
-        infoStr = [infoStr; "Примененный критерий: двухвыборочный критерий Стьюдента (two-sample t-Test)"];
-        infoStr = [infoStr; "Нулевая гипотеза: выборки имеют независимые нормальные распределения с одинаковыми МО и одинаковыми неизвестными дисперсиями: " + getHypothesisResultStr(h)];
-        infoStr = [infoStr; "Функция в Matlab R2017a: ttest2(x, y, alpha)"];
-        infoStr = [infoStr; ""];
-        
-        infoStr = [infoStr; "p-значение: " + num2str(p)];
-        infoStr = [infoStr; "Значение критерия: " + num2str(stats.tstat)];
-        infoStr = [infoStr; "Число степеней свободы: " + num2str(stats.df)];
-        infoStr = [infoStr; "Расчетное ско разности выборок: " + num2str(stats.sd)];
-        infoStr = [infoStr; "Доверительный интервал: " + num2str(ci(1)) + "..." + num2str(ci(2))];
+    infoStr = [infoStr; "Выборки независимы"];
+    infoStr = [infoStr; ""]; 
+    
+    [tbl,chi2,p,labels] = crosstab(datasets(1).dataset, datasets(2).dataset);
+    
+    showCrossTab(tbl, labels);
+    
+    if isnan(p)
+        h = NaN;
     else
-        
-        [h,p,ci,stats] = ztest2(datasets, 'Alpha', significanceLevel, 'Tail', tail);
-        
-        infoStr = [infoStr; "Примененный критерий: двухвыборочный критерий Стьюдента (two-sample t-Test)"];
-        infoStr = [infoStr; "Нулевая гипотеза: выборки имеют независимые нормальные распределения с одинаковыми МО и одинаковыми неизвестными дисперсиями: " + getHypothesisResultStr(h)];
-        infoStr = [infoStr; "Функция в Matlab R2017a: ttest2(x, y, alpha)"];
-        infoStr = [infoStr; ""];
-        
-        infoStr = [infoStr; "p-значение: " + num2str(p)];
-        infoStr = [infoStr; "Значение критерия: " + num2str(stats.tstat)];
-        infoStr = [infoStr; "Число степеней свободы: " + num2str(stats.df)];
-        infoStr = [infoStr; "Расчетное ско разности выборок: " + num2str(stats.sd)];
-        infoStr = [infoStr; "Доверительный интервал: " + num2str(ci(1)) + "..." + num2str(ci(2))];
-    end  
+        h = cast(p <= significanceLevel, 'like', p);        
+    end    
+    
+    infoStr = [infoStr; "Примененный критерий: критерий Хи-квадрат (Chi-square test)"];
+    infoStr = [infoStr; "Нулевая гипотеза: выборки имеют одинаковые распределения: " + getHypothesisResultStr(h)];
+    infoStr = [infoStr; ""];
+    
+    infoStr = [infoStr; "Хи-квадрат: " + num2str(chi2)];
+    infoStr = [infoStr; "p-значение: " + num2str(p)];
     
 else
         
     infoStr = [infoStr; "Выборки зависимы"];
     infoStr = [infoStr; ""];
-    
-    [h,p,ci,stats] = macnimar2(datasets, 'Alpha', significanceLevel, 'Tail', tail);
-    
-    infoStr = [infoStr; "Примененный критерий: двухвыборочный критерий Стьюдента (two-sample t-Test)"];
-    infoStr = [infoStr; "Нулевая гипотеза: выборки имеют независимые нормальные распределения с одинаковыми МО и одинаковыми неизвестными дисперсиями: " + getHypothesisResultStr(h)];
-    infoStr = [infoStr; "Функция в Matlab R2017a: ttest2(x, y, alpha)"];
-    infoStr = [infoStr; ""];
-    
-    infoStr = [infoStr; "p-значение: " + num2str(p)];
-    infoStr = [infoStr; "Значение критерия: " + num2str(stats.tstat)];
-    infoStr = [infoStr; "Число степеней свободы: " + num2str(stats.df)];
-    infoStr = [infoStr; "Расчетное ско разности выборок: " + num2str(stats.sd)];
-    infoStr = [infoStr; "Доверительный интервал: " + num2str(ci(1)) + "..." + num2str(ci(2))];
     
 end
 

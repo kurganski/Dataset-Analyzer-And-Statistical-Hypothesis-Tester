@@ -41,4 +41,4 @@ for x = 1:length(menuShortNames)
 end
 
 dataNames(dataNames == "") = [];
-dataNames = unique(dataNames);
+dataNames = unique(dataNames, 'stable');

@@ -27,14 +27,13 @@ end
 
 infoStr = [infoStr; ""];
 infoStr = [infoStr; "Уровень значимости: " + num2str(significanceLevel)];
-infoStr = [infoStr; "Тип гипотезы: " + tailStr];
 
 tail = getDictValue(tailStr);
 
 if isDatasetsIndependent
     
         infoStr = [infoStr; "Выборки независимы"];
-        isVarianceEqual = ~vartest2(datasets(1).dataset, datasets(2).dataset, 'Alpha', significanceLevel, 'Tail', tail);
+        isVarianceEqual = ~vartest2(datasets(1).dataset, datasets(2).dataset, 'Alpha', significanceLevel);
         
         if isAllNormalDistribution
             
@@ -49,6 +48,7 @@ if isDatasetsIndependent
                                 
                 infoStr = [infoStr; "Примененный критерий: двухвыборочный критерий Стьюдента (two-sample t-Test)"];
                 infoStr = [infoStr; "Нулевая гипотеза: выборки имеют независимые нормальные распределения с одинаковыми МО и одинаковыми неизвестными дисперсиями: " + getHypothesisResultStr(h)];
+                infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
                 infoStr = [infoStr; "Функция в Matlab R2017a: ttest2(x, y, alpha)"];
                 infoStr = [infoStr; ""];
                 
@@ -67,6 +67,7 @@ if isDatasetsIndependent
                 
                 infoStr = [infoStr; "Примененный критерий: двухвыборочный критерий Стьюдента (two-sample t-Test)"];
                 infoStr = [infoStr; "Нулевая гипотеза: выборки имеют независимые нормальные распределения с одинаковыми МО и разными дисперсиями: " + getHypothesisResultStr(h)];
+                infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
                 infoStr = [infoStr; "Функция в Matlab R2017a: ttest2(x, y, alpha, 'Vartype','unequal')"];
                 infoStr = [infoStr; ""];
                 
@@ -89,6 +90,7 @@ if isDatasetsIndependent
                 
                 infoStr = [infoStr; "Примененный критерий: Критерий Манна-Уитни-Уилкоксона (Mann-Whitney-Wilcoxon rank test)"];
                 infoStr = [infoStr; "Нулевая гипотеза: выборки имеют непрерывные распределениям с одинаковыми медианами: " + getHypothesisResultStr(h)];
+                infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
                 infoStr = [infoStr; "Функция в Matlab R2017a: ranksum(x, y, alpha)"];
                 infoStr = [infoStr; ""];
                 
@@ -100,10 +102,12 @@ if isDatasetsIndependent
                 infoStr = [infoStr; "Дисперсии не равны"];
                 infoStr = [infoStr; ""];
                 
-                [h,p,k] = kstest2(datasets(1).dataset, datasets(2).dataset, 'Alpha', significanceLevel);               
+                [ksTestTail, ksTestTailStr] = getKsTestTail(tail);
+                [h,p,k] = kstest2(datasets(1).dataset, datasets(2).dataset, 'Alpha', significanceLevel, 'tail', ksTestTail);               
                 
                 infoStr = [infoStr; "Примененный критерий: Критерий Колмогорова-Смирнова (Kolmogorov-Smirnov test)"];
-                infoStr = [infoStr; "Нулевая гипотеза: выборки имеют непрерывное одинаковое распределение: " + getHypothesisResultStr(h)];
+                infoStr = [infoStr; "Нулевая гипотеза: выборки имеют непрерывное одинаковое распределение: " + getHypothesisResultStr(h)];                
+                infoStr = [infoStr; "Тип альтернативной гипотезы: " + ksTestTailStr];
                 infoStr = [infoStr; "Функция в Matlab R2017a: kstest2(x, y, alpha)"];
                 infoStr = [infoStr; ""];
                 
@@ -123,6 +127,7 @@ if isDatasetsIndependent
             
             infoStr = [infoStr; "Примененный критерий: Парный критерий Стьюдента (Paired t-Test)"];
             infoStr = [infoStr; "Нулевая гипотеза: выборка из разностей значений выборок имеет нормальное распределение с нулевым МО и неизвестной дисперсией: " + getHypothesisResultStr(h)];
+            infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
             infoStr = [infoStr; "Функция в Matlab R2017a: ttest(x, y, alpha)"];
             infoStr = [infoStr; ""];
             
@@ -133,13 +138,14 @@ if isDatasetsIndependent
             infoStr = [infoStr; "Доверительный интервал: " + num2str(ci(1)) + "..." + num2str(ci(2))];
             
         else
-            infoStr = [infoStr; "не все выборки распределены нормально (по критерию Андерсона-Дарлинга)"];
+            infoStr = [infoStr; "Не все выборки распределены нормально (по критерию Андерсона-Дарлинга)"];
             infoStr = [infoStr; ""];
             
             [p,h,stats] = signrank(datasets(1).dataset, datasets(2).dataset, 'alpha', significanceLevel, 'tail', tail);
             
             infoStr = [infoStr; "Примененный критерий: Критерий Манна-Уитни-Уилкоксона (Mann-Whitney-Wilcoxon rank test)"];
             infoStr = [infoStr; "Нулевая гипотеза: выборка из разностей значений выборок имеет распределение с нулевой медианой: " + getHypothesisResultStr(h)];
+            infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
             infoStr = [infoStr; "Функция в Matlab R2017a: signrank(x, y, alpha)"];
             infoStr = [infoStr; ""];
             

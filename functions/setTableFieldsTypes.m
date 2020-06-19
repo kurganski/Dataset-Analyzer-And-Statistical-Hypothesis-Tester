@@ -7,7 +7,9 @@ inputTable(1,:) = [];
 
 for x = 1:size(inputTable,2)
    
-    currentColumn = inputTable{:,x};
+    currentColumn = string(inputTable{:,x});
+    currentColumn(ismissing(currentColumn)) = "";
+    
     currentColumnType = getSampleType(currentColumn);
     outputTableNames(2,x) = currentColumnType;
     currentColumn = setSampleType(currentColumn, currentColumnType); 
