@@ -35,33 +35,30 @@ setappdata(handles.MainWindow,'HeatMapIcon',imread('HeatMapChart.png'));
 setappdata(handles.MainWindow,'ErrorBarIcon',imread('ErrorBarPlot.png'));
 setappdata(handles.MainWindow,'ScatterIcon',imread('ScatterPlot.png'));
 setappdata(handles.MainWindow,'PieIcon',imread('PieChart.png'));
+setappdata(handles.MainWindow,'ScatterPlotMatrix',imread('ScatterPlotMatrix.png'));
 
 setFigureInCenter(handles.MainWindow);
 setappdata(handles.MainWindow,'graphs',graphsNames);
 setappdata(handles.MainWindow,'graphHelpStr',graphsHelpInfos);
 
 
-% TODO: 
+% NEW FUNCTIONALITY
+%  
 % точный макнемара сделать
-% 3 и более номинативные добавить хи квадрат
-
-% добавить таблицу сопряженности CROSSTAB
-% gplotmatrix 
-% mosaic plot
-% boxplot
-% проверки выбора данных для анализа
-% описать какие конкретно версии точных критериев применяются
-
-% не запускать фильтрацию таблицы каждый раз, если значения фильтров пустые
-
-% если удалили модальное окно загрузки - не выкидывать ошибку
-
+% точный Кохрена сделать
+% точный для 3 дихотомических добавить
+% зависимые номинативные выборки критерий добавить
 % добавить хвосты и доверительные инервалы для дихотомиеских критериев
 
-% типов выборок и количество уникальных категорий??  - уникальные значения
-% должны совпадать
-% при анове желательно сравнивать дисперсии - посмотреть в книжке
 
+% USER DESCRIPTIONS
+% 
+
+
+% CODE REFACTOR
+% 
+% вызов ошибки сделать методом
+% не запускать фильтрацию таблицы каждый раз, если значения фильтров пустые
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -92,20 +89,31 @@ try
             );
     end
     
-    waitbar(0.5,h);
+    if exist('h','var')
+        waitbar(0.5,h);
+    end
+    
     [dataFrame, dataFrameNamesAndTypes] = setTableFieldsTypes(T);
     
 catch
-    close(h);
+    
+    if exist('h','var')
+        close(h);
+    end
+    
     errordlg({'Не удалось прочитать данные.';...
         'Файл должен иметь расширение "xlsx", "xls" или "csv",';...
-        'а данные должен быть представлены в виде двухмерной таблицы без вложенных столбцов/строк.'},...
+        'а данные должен быть представлены в виде двухмерной таблицы без объединенных столбцов/строк.'},...
         'Ошибка чтения файла','modal');
     return;
 end
 
 if length(unique(dataFrameNamesAndTypes(1,:))) ~= length(dataFrameNamesAndTypes(1,:))
-    close(h);
+    
+    if exist('h','var')
+        close(h);
+    end
+    
     errordlg({'Не удалось прочитать данные.';...
         'Имена столбцов должны быть уникальными.'},...
         'Ошибка чтения файла','modal');
@@ -151,7 +159,9 @@ handles.FilterValuePopupMenu3.Enable = 'On';
 handles.FilterValuePopupMenu4.Enable = 'On';
 handles.FilterValuePopupMenu5.Enable = 'On';
 
-waitbar(0.75,h);
+if exist('h','var')
+    waitbar(0.75,h);
+end
 
 ShowAnalyzedData_Callback(hObject, eventdata, handles); 
 
@@ -177,8 +187,10 @@ handles.ShowColList1.Visible = 'On';
 handles.ShowColList2.Visible = 'On';
 handles.ShowColList3.Visible = 'On';
 
-waitbar(1,h);
-close(h);
+if exist('h','var')
+    waitbar(1,h);
+    close(h);
+end
 
 
 function ColumnAdderMenu_Callback(hObject, eventdata, handles)
@@ -259,19 +271,21 @@ switch getMenuString(handles.GraphPopupmenu)
         imshow(getappdata(handles.MainWindow,'HistogramIcon'),...
             'Parent',handles.IconAxes);
         
-        handles.X1popupmenu.String = numericDataNames;
-        handles.X2popupmenu.String = numericDataNames;
-        handles.X3popupmenu.String = numericDataNames;
-        handles.X4popupmenu.String = numericDataNames;
-        handles.X5popupmenu.String = numericDataNames;
-        handles.X6popupmenu.String = numericDataNames;
+        handles.Y1popupmenu.String = numericDataNames;
+        handles.Y2popupmenu.String = numericDataNames;
+        handles.Y3popupmenu.String = numericDataNames;
+        handles.Y4popupmenu.String = numericDataNames;
+        handles.Y5popupmenu.String = numericDataNames;
+        handles.Y6popupmenu.String = numericDataNames;
         
-        handles.X1popupmenu.Enable = 'On';        
-        handles.X2popupmenu.Enable = 'On';
-        handles.X3popupmenu.Enable = 'On';
-        handles.X4popupmenu.Enable = 'On';
-        handles.X5popupmenu.Enable = 'On';
-        handles.X6popupmenu.Enable = 'On';   
+        handles.Y1popupmenu.Enable = 'On';        
+        handles.Y2popupmenu.Enable = 'On';
+        handles.Y3popupmenu.Enable = 'On';
+        handles.Y4popupmenu.Enable = 'On';
+        handles.Y5popupmenu.Enable = 'On';
+        handles.Y6popupmenu.Enable = 'On';   
+        
+        handles.uipanel1.Title = 'Выборки';
         
         handles.GraphAdditionalPopupMenu1.Visible = 'On';
         handles.GraphAdditionalPopupMenu1.String = {'Абсолютная','Нормированная'};
@@ -296,17 +310,47 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.X3popupmenu.Enable = 'On';
         handles.X4popupmenu.Enable = 'On';
         handles.X5popupmenu.Enable = 'On';
-        handles.X6popupmenu.Enable = 'On';        
+        handles.X6popupmenu.Enable = 'On';  
         
-    case graphs(3)
+        handles.uipanel1.Title = 'Зависимая выборка';
+        handles.uipanel2.Title = 'Независимые выборки'; 
+    
+    case graphs(3)  
+        
+        imshow(getappdata(handles.MainWindow,'ScatterPlotMatrix'),...
+            'Parent',handles.IconAxes); 
+        
+        handles.X1popupmenu.String = allDataNames;
+        handles.X1popupmenu.Enable = 'On';
+        
+        handles.Y1popupmenu.String = numericDataNames;
+        handles.Y2popupmenu.String = numericDataNames;
+        handles.Y3popupmenu.String = numericDataNames;
+        handles.Y4popupmenu.String = numericDataNames;
+        handles.Y5popupmenu.String = numericDataNames;
+        handles.Y6popupmenu.String = numericDataNames;        
+        
+        handles.Y1popupmenu.Enable = 'On';
+        handles.Y2popupmenu.Enable = 'On';
+        handles.Y3popupmenu.Enable = 'On';
+        handles.Y4popupmenu.Enable = 'On';
+        handles.Y5popupmenu.Enable = 'On';
+        handles.Y6popupmenu.Enable = 'On';  
+        
+        handles.uipanel1.Title = 'Выборки'; 
+        handles.uipanel2.Title = 'Факторная выборка';
+    
+    case graphs(4)
         
         imshow(getappdata(handles.MainWindow,'PieIcon'),...
             'Parent',handles.IconAxes);
         
-        handles.X1popupmenu.String = stringAndLogicalDataNames;
-        handles.X1popupmenu.Enable = 'On';
+        handles.Y1popupmenu.String = stringAndLogicalDataNames;
+        handles.Y1popupmenu.Enable = 'On';
         
-    case graphs(4)
+        handles.uipanel1.Title = 'Выборка';
+        
+    case graphs(5)
         
         imshow(getappdata(handles.MainWindow,'HeatMapIcon'),...
             'Parent',handles.IconAxes);        
@@ -322,29 +366,34 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.GraphAdditionalPopupMenu1.Visible = 'On';
         handles.GraphAdditionalPopupMenu1.String = {'Среднее','Медиана','Сумма'};
         
-    case graphs(5)
+        handles.uipanel1.Title = 'Зависимая выборка';
+        handles.uipanel2.Title = 'Независимые выборки';
+        
+    case graphs(6)
         
         imshow(getappdata(handles.MainWindow,'HeatMapIcon'),...
             'Parent',handles.IconAxes);        
         
-        handles.X1popupmenu.String = numericDataNames;
-        handles.X2popupmenu.String = numericDataNames;
-        handles.X3popupmenu.String = numericDataNames;
-        handles.X4popupmenu.String = numericDataNames;
-        handles.X5popupmenu.String = numericDataNames;
-        handles.X6popupmenu.String = numericDataNames;
+        handles.Y1popupmenu.String = numericDataNames;
+        handles.Y2popupmenu.String = numericDataNames;
+        handles.Y3popupmenu.String = numericDataNames;
+        handles.Y4popupmenu.String = numericDataNames;
+        handles.Y5popupmenu.String = numericDataNames;
+        handles.Y6popupmenu.String = numericDataNames;
         
-        handles.X1popupmenu.Enable = 'On';
-        handles.X2popupmenu.Enable = 'On';
-        handles.X3popupmenu.Enable = 'On';
-        handles.X4popupmenu.Enable = 'On';
-        handles.X5popupmenu.Enable = 'On';
-        handles.X6popupmenu.Enable = 'On';  
+        handles.Y1popupmenu.Enable = 'On';
+        handles.Y2popupmenu.Enable = 'On';
+        handles.Y3popupmenu.Enable = 'On';
+        handles.Y4popupmenu.Enable = 'On';
+        handles.Y5popupmenu.Enable = 'On';
+        handles.Y6popupmenu.Enable = 'On';  
         
         handles.GraphAdditionalPopupMenu1.Visible = 'On';
-        handles.GraphAdditionalPopupMenu1.String = {'Пирсона','Кендалла','Спирмена'};      
+        handles.GraphAdditionalPopupMenu1.String = {'Пирсона','Кендалла','Спирмена'};  
         
-    case graphs(6)
+        handles.uipanel1.Title = 'Выборки'; 
+        
+    case graphs(7)
         
         imshow(getappdata(handles.MainWindow,'ErrorBarIcon'),...
             'Parent',handles.IconAxes);   
@@ -355,7 +404,10 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.X1popupmenu.String = stringAndLogicalDataNames;        
         handles.X1popupmenu.Enable = 'On';
         
-    case graphs(7)
+        handles.uipanel1.Title = 'Зависимая выборка';
+        handles.uipanel2.Title = 'Независимая выборка';
+        
+    case graphs(8)
         
         imshow(getappdata(handles.MainWindow,'HistogramIcon'),...
             'Parent',handles.IconAxes);      
@@ -364,10 +416,13 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y1popupmenu.Enable = 'On';
         
         handles.X1popupmenu.String = stringAndLogicalDataNames;        
-        handles.X1popupmenu.Enable = 'On';          
+        handles.X1popupmenu.Enable = 'On'; 
+        
+        handles.uipanel1.Title = 'Зависимая выборка';
+        handles.uipanel2.Title = 'Независимая выборка';         
     
 %   Выявление различий 1й числовой выборки
-    case graphs(8)
+    case graphs(9)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -392,8 +447,10 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y1popupmenu.String = numericDataNames;        
         handles.Y1popupmenu.Enable = 'On';
+        
+        handles.uipanel1.Title = 'Выборка';
     
-    case graphs(9)
+    case graphs(10)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';
@@ -423,8 +480,10 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y2popupmenu.String = numericDataNames;        
         handles.Y1popupmenu.Enable = 'On';  
+        
+        handles.uipanel1.Title = 'Выборки';
     
-    case graphs(10)
+    case graphs(11)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';
@@ -471,8 +530,11 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.X1popupmenu.String = stringAndLogicalDataNames;        
         handles.X1popupmenu.Enable = 'On'; 
+        
+        handles.uipanel1.Title = 'Выборки';
+        handles.uipanel2.Title = 'Факторная выборка';
     
-    case graphs(11)        
+    case graphs(12)        
         
         handles.Y1popupmenu.String = numericDataNames;
         handles.Y1popupmenu.Enable = 'On';          
@@ -510,8 +572,11 @@ switch getMenuString(handles.GraphPopupmenu)
             'Сравнение: Шеффи'....
             };
         
+        handles.uipanel1.Title = 'Зависимая выборка';
+        handles.uipanel2.Title = 'Факторные выборки';
+        
 %     Выявление различий 1й дихотомической выборки    
-    case graphs(12)
+    case graphs(13)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -531,7 +596,9 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y1popupmenu.String = logicalDataNames;        
         handles.Y1popupmenu.Enable = 'On';
     
-    case graphs(13)
+        handles.uipanel1.Title = 'Выборка';
+    
+    case graphs(14)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -556,7 +623,9 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y2popupmenu.String = logicalDataNames;
         handles.Y2popupmenu.Enable = 'On'; 
     
-    case graphs(14)
+        handles.uipanel1.Title = 'Выборки';
+        
+    case graphs(15)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -585,10 +654,12 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y6popupmenu.String = logicalDataNames;
         handles.Y6popupmenu.Enable = 'On'; 
+    
+        handles.uipanel1.Title = 'Выборки';
         
         
 %     Выявление различий 2х номинативных выборок
-    case graphs(15)
+    case graphs(16)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -606,11 +677,19 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y2popupmenu.String = stringDataNames;
         handles.Y2popupmenu.Enable = 'On'; 
     
-    case graphs(16)
+        handles.uipanel1.Title = 'Выборки';
+    
+    case graphs(17)
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
         handles.ValueLevelText.String = 'Уровень значимости:';
+        
+        handles.GraphAdditionalPopupMenu1.Visible = 'On';
+        handles.GraphAdditionalPopupMenu1.String = {...
+            'Выборки независимы',...
+            'Выборки зависимы'...
+            };   
         
         handles.Y1popupmenu.String = stringDataNames;        
         handles.Y1popupmenu.Enable = 'On';
@@ -629,8 +708,28 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y6popupmenu.String = stringDataNames;
         handles.Y6popupmenu.Enable = 'On'; 
+    
+        handles.uipanel1.Title = 'Выборки';
         
+    % таблица сопряженности
+    case graphs(18)
         
+        handles.Y1popupmenu.String = stringAndLogicalDataNames;
+        handles.Y2popupmenu.String = stringAndLogicalDataNames;
+        handles.Y3popupmenu.String = stringAndLogicalDataNames;
+        handles.Y4popupmenu.String = stringAndLogicalDataNames;
+        handles.Y5popupmenu.String = stringAndLogicalDataNames;
+        handles.Y6popupmenu.String = stringAndLogicalDataNames;
+        
+        handles.Y1popupmenu.Enable = 'On';
+        handles.Y2popupmenu.Enable = 'On';
+        handles.Y3popupmenu.Enable = 'On';
+        handles.Y4popupmenu.Enable = 'On';
+        handles.Y5popupmenu.Enable = 'On';
+        handles.Y6popupmenu.Enable = 'On';   
+    
+        handles.uipanel1.Title = 'Выборки'; 
+         
         
     otherwise
         
@@ -737,7 +836,7 @@ graphs = getappdata(handles.MainWindow,'graphs');
 
 switch getMenuString(handles.GraphPopupmenu)
     
-    case graphs(10)
+    case graphs(11)
         
         if getMenuString(handles.GraphAdditionalPopupMenu1) == 'Выборки независимы'
             handles.X1popupmenu.Enable = 'On';     
@@ -763,16 +862,20 @@ switch hObject
         
         values = handles.ShowColPopupmenu1.Value;
         listHandles = handles.ShowColList1;
+        textHandles = handles.ShowColText1;
+        
         
     case handles.ShowColPopupmenu2
         
         values = handles.ShowColPopupmenu2.Value;
         listHandles = handles.ShowColList2;
+        textHandles = handles.ShowColText2;
         
     case handles.ShowColPopupmenu3
         
         values = handles.ShowColPopupmenu3.Value;
         listHandles = handles.ShowColList3;
+        textHandles = handles.ShowColText3;
         
     case handles.OpenDataTable
         
@@ -781,20 +884,30 @@ switch hObject
                     handles.ShowColPopupmenu3.Value] ;
                 
         listHandles = [ handles.ShowColList1 handles.ShowColList2 handles.ShowColList3 ];
+        textHandles = [ handles.ShowColText1 handles.ShowColText2 handles.ShowColText3];
         
     otherwise
-        assert(0, 'Вызов из расшаренного callback');
+        assert(0, 'Вызов не из расшаренного callback');
 end
         
 cellData = handles.DataTable.Data;
-
+dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
 numbers = 1:size(cellData,1);
 
 for x = 1:length(values)
     
     data = string(cell2mat(cellData(:,values(x))));
     data(ismissing(data)) = " ";
-    listHandles(x).String = strcat(num2str(numbers'), ") ", data);    
+    listHandles(x).String = strcat(num2str(numbers'), ") ", data);      
+    
+    textHandles(x).String = "Cтрок: " + ...
+                                    num2str(sum((data ~= " "))) + " из " + ...
+                                    num2str(length(data)) + " ("   + ...
+                                    dataFrameNamesAndTypes(2,values(x))  + ...
+                                    ")"; 
+    
+    
+    
 end
     
 
@@ -837,7 +950,7 @@ switch getMenuString(handles.GraphPopupmenu)
     case graphs(1)  
         
         hold on;
-        dataNames = getDataNames(handles, ["X1","X2","X3","X4","X5","X6"]);
+        dataNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]);
         
         if isempty(dataNames)
             errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
@@ -876,9 +989,36 @@ switch getMenuString(handles.GraphPopupmenu)
         ylabel(dataYName);
         title(getMenuString(handles.GraphPopupmenu));
         
-    case graphs(3)
+    
+    case graphs(3)    
         
-        dataYName = getDataNames(handles, "X1");   
+        hold on;
+        
+        dataNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]);        
+        groupName = getDataNames(handles, "X1");
+        
+        if isempty(dataNames) || isempty(groupName)
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
+            delete(graphFigure);
+            return            
+        end
+        
+        data = retrieveData(dataFrame, dataFrameNamesAndTypes, dataNames);
+        group = retrieveData(dataFrame, dataFrameNamesAndTypes, groupName);
+        
+        % грязный хак, почему то не видит окно с осью, если запускать со
+        % старта приложения
+        try
+            gplotmatrix(data, [], group,[],[],[],[],[],cellstr(dataNames));        
+        catch
+            gplotmatrix(data, [], group,[],[],[],[],[],cellstr(dataNames));
+        end
+        
+        title(getMenuString(handles.GraphPopupmenu));
+        
+    case graphs(4)
+        
+        dataYName = getDataNames(handles, "Y1");   
         
         if isempty(dataYName)
             errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
@@ -902,7 +1042,7 @@ switch getMenuString(handles.GraphPopupmenu)
         title({getMenuString(handles.GraphPopupmenu) titleSuffix});        
         
 
-    case graphs(4)
+    case graphs(5)
         
         hold on;
         colorDataName = getDataNames(handles, "Y1"); 
@@ -944,10 +1084,10 @@ switch getMenuString(handles.GraphPopupmenu)
         xlabel(dataXName);
         ylabel(dataYName); 
             
-    case graphs(5)
+    case graphs(6)
         
         hold off;        
-        dataYNames = getDataNames(handles, ["X1","X2","X3","X4","X5","X6"]); 
+        dataYNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]); 
         
         if isempty(dataYNames)
             errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
@@ -970,7 +1110,7 @@ switch getMenuString(handles.GraphPopupmenu)
         graphFigure.Visible = 'On';
         return
         
-    case graphs(6)        
+    case graphs(7)        
         
         hold on;
         dataYName = getDataNames(handles, "Y1");
@@ -999,7 +1139,7 @@ switch getMenuString(handles.GraphPopupmenu)
         ylabel(dataYName);        
         title({getMenuString(handles.GraphPopupmenu) titleSuffix});
     
-    case graphs(7)
+    case graphs(8)
         
         hold on;
         dataYName = getDataNames(handles, "Y1");
@@ -1036,7 +1176,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         
     %   Выявления различий
-    case {graphs{8}, graphs{9}, graphs{10}, graphs{12}, graphs{13}, graphs{14}, graphs{15}  }   
+    case {graphs{9}, graphs{10}, graphs{11}, graphs{13}, graphs{14}, graphs{15}, graphs{16}, graphs{17}}   
         
         dataYNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]); 
         
@@ -1067,12 +1207,12 @@ switch getMenuString(handles.GraphPopupmenu)
         
         switch getMenuString(handles.GraphPopupmenu)
            
-            case graphs(8)
+            case graphs(9)
                 
                 mu = getNumberFromEdit(handles.MuEdit);
                 
                 if isnan(mu)
-                    errordlg('Общеизвестное среднее mu должно быть задано числом',...
+                    errordlg('Предполагаемое среднее mu должно быть задано числом',...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
@@ -1083,7 +1223,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForOneSampleNumericData(...
                     datasets, significanceLevel, isDatasetsRanged, mu, tailStr);
                 
-            case graphs(9)
+            case graphs(10)
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                 isDatasetsRanged = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3));
@@ -1091,7 +1231,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForTwoSamplesNumericData(...
                     datasets, significanceLevel, isDatasetsRanged, isDatasetsIndependent, tailStr);
                 
-            case graphs(10)                                
+            case graphs(11)                                
                 
                 dataXName = getDataNames(handles, "X1");
                 groupData = createDatasetsForCriteria(dataFrame, dataFrameNamesAndTypes, dataXName);                
@@ -1102,7 +1242,7 @@ switch getMenuString(handles.GraphPopupmenu)
                                 
                 if isempty(groupData) && size(datasets,2) < 3
                     errordlg(['Для сбалансированного анализа дисперсий должно быть выбрано' ...
-                            'не меньше 3х уникальных выборок'],...
+                            'не менее 3х уникальных выборок'],...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
@@ -1120,7 +1260,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     datasets, significanceLevel, isDatasetsIndependentStr, isDatasetsRangedStr, cmprTypeStr, groupData);
                           
 % % %       
-            case graphs(12)
+            case graphs(13)
                 
                 supposedProbability = getNumberFromEdit(handles.MuEdit);                
                 
@@ -1136,32 +1276,53 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForOneSampleDichotomousData(...
                     datasets, significanceLevel, supposedProbability, tailStr);
                 
-            case graphs(13)
+            case graphs(14)
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
-                
-                data = replaceNanStrings([datasets(1).dataset, datasets(2).dataset]);
-                datasets(1).dataset = data(:,1);
-                datasets(2).dataset = data(:,2);
-                
-                infoStr = calulateCriteriaForTwoSamplesDichotomousData(...
-                    datasets, significanceLevel, isDatasetsIndependent, tailStr);
-                
-            case graphs(14)                
-                
-                isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
-                              
-                if size(datasets,2) < 3
-                    errordlg(' Выберите не меньше 3х уникальных выборок',...
+                        
+                if size(datasets,2) ~= 2
+                    errordlg(' Выберите 2 уникальные выборки',...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
                 end
                 
+                [datasets,emptyFlag] = replaceNanStrings(datasets);
+                
+                if emptyFlag
+                    errordlg('После удаления NaN одна или более выборок стали пустыми',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end
+                
+                infoStr = calulateCriteriaForTwoSamplesDichotomousData(...
+                    datasets, significanceLevel, isDatasetsIndependent, tailStr);
+                
+            case graphs(15)                
+                
+                isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
+                              
+                if size(datasets,2) < 3
+                    errordlg(' Выберите не менее 3х уникальных выборок',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end                
+                
+                [datasets,emptyFlag] = replaceNanStrings(datasets);
+                
+                if emptyFlag
+                    errordlg('После удаления NaN одна или более выборок стали пустыми',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end
+                
                 infoStr = calulateCriteriaForMultipleSamplesDichotomousData(...
                     datasets, significanceLevel, isDatasetsIndependent);
                 
-            case graphs(15)
+            case graphs(16)
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                     
@@ -1170,21 +1331,48 @@ switch getMenuString(handles.GraphPopupmenu)
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
+                end        
+                
+                [datasets,emptyFlag] = replaceNanStrings(datasets);
+                
+                if emptyFlag
+                    errordlg('После удаления NaN одна или более выборок стали пустыми',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
                 end
                 
                 infoStr = calulateCriteriaForTwoSamplesCategoricalData(...
                     datasets, significanceLevel, isDatasetsIndependent);
                 
-            case graphs(16)
+            case graphs(17)
+                
+                isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
+                          
+                if size(datasets,2) < 3
+                    errordlg(' Выберите не менее 3х уникальных выборок',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end        
+                
+                [datasets,emptyFlag] = replaceNanStrings(datasets);
+                
+                if emptyFlag
+                    errordlg('После удаления NaN одна или более выборок стали пустыми',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end
                 
                 infoStr = calulateCriteriaForMultipleSamplesCategoricalData(...
-                    datasets, significanceLevel);
+                    datasets, significanceLevel, isDatasetsIndependent);
                 
         end               
         
         printInfo(graphFigure, infoStr); 
                 
-    case graphs(11)
+    case graphs(12)
         
         significanceLevel = getNumberFromEdit(handles.ValueLevelEdit);
                 
@@ -1221,6 +1409,26 @@ switch getMenuString(handles.GraphPopupmenu)
         infoStr = calulateAnovan(dataY, datasets, sstypeStr, significanceLevel, cmprTypeStr);
         printInfo(graphFigure, infoStr);        
         
+    
+    case graphs(18)
+    
+        dataNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]);        
+        
+        if size(dataNames,1) < 2
+            errordlg('Выберите 2 или более уникальных выборок',...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end        
+        
+        datasets = createDatasetsForCriteria(dataFrame, dataFrameNamesAndTypes, dataNames);
+        
+        [tbl,chi2,p,labels] = callCrosstab(datasets);
+        
+        showCrossTab(tbl, chi2, p, labels, dataNames);
+        delete(graphFigure);
+        return 
+    
     otherwise
         
         assert(0,'некорректное значение графика');       

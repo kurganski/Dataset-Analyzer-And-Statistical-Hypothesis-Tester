@@ -2,9 +2,11 @@ function infoStr = calulateCriteriaForTwoSamplesCategoricalData( ...
                                 datasets, significanceLevel, isDatasetsIndependent )
 
 infoStr = "Анализ выборок:";
+datasetsNames = strings(1,size(datasets,2));
 
 for x = 1:size(datasets,2)
     infoStr = [infoStr; " - " + datasets(x).name + " [ тип данных: " + datasets(x).type + "]"];
+    datasetsNames(x) = datasets(x).name;
 end
 
 infoStr = [infoStr; ""];
@@ -15,10 +17,10 @@ if isDatasetsIndependent
     
     infoStr = [infoStr; "Выборки независимы"];
     infoStr = [infoStr; ""]; 
+            
+    [tbl,chi2,p,labels] = callCrosstab(datasets); 
     
-    [tbl,chi2,p,labels] = crosstab(datasets(1).dataset, datasets(2).dataset);
-    
-    showCrossTab(tbl, labels);
+    showCrossTab(tbl,chi2,p,labels, datasetsNames);
     
     if isnan(p)
         h = NaN;

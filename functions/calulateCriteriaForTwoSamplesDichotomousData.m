@@ -80,6 +80,9 @@ else
     
     infoStr = [infoStr; "p-значение: " + num2str(p)];
     infoStr = [infoStr; "Хи-квадрат: " + num2str(chi2)];
+    infoStr = [infoStr; ""];
+    infoStr = [infoStr;...
+        "Если критерий не вышло рассчитать, то возможно необходимо применять точный критерий Макнемара, который пока не реализован" ];
     
 end
 

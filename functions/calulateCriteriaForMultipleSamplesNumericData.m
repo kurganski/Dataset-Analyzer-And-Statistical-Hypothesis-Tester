@@ -17,12 +17,12 @@ cmprType = getDictValue(cmprTypeStr);
 isDatasetsIndependent = getDictValue(isDatasetsIndependentStr);
 isDatasetsRanged = getDictValue(isDatasetsRangedStr);
 
-isAllNormalDistribution = false;
 infoStr = [infoStr; ""];
 infoStr = [infoStr; isDatasetsIndependentStr];
 infoStr = [infoStr; "Уровень значимости: " + num2str(significanceLevel)];
 
 % узнаю распределения, если не ранжированы выборки
+isAllNormalDistribution = false;
 if ~isDatasetsRanged
     for x = 1:size(datasets,2)
         % если adtest == 0, то нормальное
@@ -31,6 +31,19 @@ if ~isDatasetsRanged
             break;
         end        
     end
+    
+    
+end
+
+isAllVarianceEqual = false;
+if ~isDatasetsRanged
+    for x = 1:size(datasets,2)
+        % если adtest == 0, то нормальное
+        isAllVarianceEqual = ~vartest2(datasets(x).dataset, 'Alpha', significanceLevel);
+        if ~isAllNormalDistribution
+            break;
+        end        
+    end 
 end
 
 dataForAnova = groupDataForAnova(datasets);
@@ -44,11 +57,13 @@ setFigureInCenter(handle);
 if isDatasetsIndependent
       
     infoStr = [infoStr; "Выборки независимы"];
-    infoStr = [infoStr; ""];
+    infoStr = [infoStr; ""];   
+                
     
-    if isAllNormalDistribution
+    if isAllNormalDistribution && isAllVarianceEqual
         
-        infoStr = [infoStr; "Все выборки распределены нормально (по критерию Андерсона-Дарлинга)"];  
+        infoStr = [infoStr; "Все выборки распределены нормально и дисперсии одинаковы " ;...
+                        "(по критерию Андерсона-Дарлинга и F-критерию соответственно)"];  
         infoStr = [infoStr; ""];
         
         if isempty(groupData)
@@ -79,7 +94,8 @@ if isDatasetsIndependent
         infoStr = [infoStr; "Total - итоговая вариативность."];
         
     else
-        infoStr = [infoStr; "Не все выборки распределены нормально (по критерию Андерсона-Дарлинга)"];
+        infoStr = [infoStr; "Не все выборки распределены нормально или дисперсии не равны " ;...
+            "(по критерию Андерсона-Дарлинга и F-критерию соответственно)"];
         infoStr = [infoStr; ""];
         
         if isempty(groupData)

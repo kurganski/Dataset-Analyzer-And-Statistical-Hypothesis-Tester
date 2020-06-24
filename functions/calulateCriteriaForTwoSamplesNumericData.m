@@ -33,6 +33,7 @@ tail = getDictValue(tailStr);
 if isDatasetsIndependent
     
         infoStr = [infoStr; "Выборки независимы"];
+        infoStr = [infoStr; ""];
         isVarianceEqual = ~vartest2(datasets(1).dataset, datasets(2).dataset, 'Alpha', significanceLevel);
         
         if isAllNormalDistribution

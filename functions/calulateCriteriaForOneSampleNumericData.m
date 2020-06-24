@@ -25,6 +25,7 @@ if isNormalDistribution
         infoStr = [infoStr; "Нулевая гипотеза: выборка имеет нормальное распределение с неизвестной дисперсией и мат. ожиданием " + num2str(mu) + ": " + getHypothesisResultStr(h)];
         infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
         infoStr = [infoStr; "Функция в Matlab R2017a: ttest(x, mu, alpha)"];
+        infoStr = [infoStr; "Справка по функции и расшифровка характеристик: https://www.mathworks.com/help/stats/ttest.html"];
         infoStr = [infoStr; ""];
              
         infoStr = [infoStr; "p-значение: " + num2str(p)];
@@ -43,6 +44,7 @@ if isNormalDistribution
         infoStr = [infoStr; "Нулевая гипотеза: выборка имеет непрерывное распределение с медианой " + num2str(mu) + ": " + getHypothesisResultStr(h)];
         infoStr = [infoStr; "Тип альтернативной гипотезы: " + tailStr];
         infoStr = [infoStr; "Функция в Matlab R2017a: signtest(x, mu, alpha)"];
+        infoStr = [infoStr; "Справка по функции и расшифровка характеристик: https://www.mathworks.com/help/stats/signtest.html"];
         infoStr = [infoStr; ""];
         
         infoStr = [infoStr; "p-значение: " + num2str(p)];

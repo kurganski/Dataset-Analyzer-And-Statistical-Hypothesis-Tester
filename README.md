@@ -1,7 +1,7 @@
 Dataset Analyzer And Statistical Hypothesis Tester
 ==================================================
 
-Version: 0.7
+Version: 0.9
 
 The application is intended for visualization and analysis of tabular data.
 
@@ -12,7 +12,7 @@ Key Features:
 - construction of graphs and diagrams for data analysis;
 - automatic selection and calculation of criteria for testing statistical hypotheses about the difference in samples;
 - built-in help on graphs and charts;
-- application of up to 3 filters to the analyzed data.
+- application of up to 5 filters to the analyzed data.
 
 
 System requirements:
@@ -32,7 +32,7 @@ System requirements:
 - построение графиков и диаграмм для анализа данных;
 - автоматический подбор и расчет критериев проверки статистических гипотез о различии выборок;
 - встроенная справка по графикам и диаграммам;
-- применение до 3 фильтров к анализируемым данным.
+- применение до 5 фильтров к анализируемым данным.
 
 
 Системные требования:

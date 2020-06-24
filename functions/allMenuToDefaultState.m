@@ -48,5 +48,8 @@ handles.MuText.Visible = 'Off';
 handles.ValueLevelText.String = " ";
 handles.MuText.String = " ";
 
+handles.uipanel2.Title = "";
+handles.uipanel2.Title = "";
+
 cla(handles.IconAxes);
 
