@@ -997,7 +997,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         if getMenuString(handles.GraphAdditionalPopupMenu1) == "Трехмерная"
             titleSuffix = "(" + graphProperty + ")"; 
-            titleSuffix = [titleSuffix; dataNames];
+            titleSuffix = 
         else
             legend(gca,dataNames);
             titleSuffix = "(" + graphProperty + ")";          
