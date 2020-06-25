@@ -36,7 +36,8 @@ if isDatasetsIndependent
     infoStr = [infoStr; "p-значение: " + num2str(p)];
     
 else
-        
+    
+    datasets = replaceNanStrings(datasets);
     infoStr = [infoStr; "Выборки зависимы"];
     infoStr = [infoStr; ""];
     

@@ -36,7 +36,8 @@ if isDatasetsIndependent
     infoStr = [infoStr; "Хи-квадрат: " + num2str(chi2)];
     infoStr = [infoStr; "p-значение: " + num2str(p)];    
 else
-        
+    
+    datasets = replaceNanStrings(datasets);    
     infoStr = [infoStr; "Выборки зависимы"];
     infoStr = [infoStr; ""];
     infoStr = [infoStr; "Критерий для зависимых выборок пока не реализован"];

@@ -28,7 +28,7 @@ handles.MainWindow.Visible = 'off';
 handles.output = hObject;
 guidata(hObject, handles);
 
-[graphsNames, graphsHelpInfos] = getGraphs();
+graphs = getGraphs();
 
 setappdata(handles.MainWindow,'HistogramIcon',imread('HistogramPlot.png'));
 setappdata(handles.MainWindow,'HeatMapIcon',imread('HeatMapChart.png'));
@@ -38,8 +38,7 @@ setappdata(handles.MainWindow,'PieIcon',imread('PieChart.png'));
 setappdata(handles.MainWindow,'ScatterPlotMatrix',imread('ScatterPlotMatrix.png'));
 
 setFigureInCenter(handles.MainWindow);
-setappdata(handles.MainWindow,'graphs',graphsNames);
-setappdata(handles.MainWindow,'graphHelpStr',graphsHelpInfos);
+setappdata(handles.MainWindow,'graphs',graphs);
 
 
 % NEW FUNCTIONALITY
@@ -123,7 +122,8 @@ end
 setappdata(handles.MainWindow,'dataFrame',dataFrame);
 setappdata(handles.MainWindow,'dataFrameNamesAndTypes',dataFrameNamesAndTypes);
 
-handles.GraphPopupmenu.String = getappdata(handles.MainWindow,'graphs');
+handles.GraphPopupmenu.String = getGraphsNames(getappdata(handles.MainWindow,'graphs'));
+
 handles.FilterPopupMenu1.String = ["" dataFrameNamesAndTypes(1,:)];
 handles.FilterPopupMenu2.String = ["" dataFrameNamesAndTypes(1,:)];
 handles.FilterPopupMenu3.String = ["" dataFrameNamesAndTypes(1,:)];
@@ -249,8 +249,10 @@ msgbox (...
 
 function GraphPopupmenu_Callback(hObject, eventdata, handles)
 
+
 graphs = getappdata(handles.MainWindow,'graphs');
-graphHelpStr = getappdata(handles.MainWindow,'graphHelpStr');
+graphDescriptions = getGraphsDescriptions(getappdata(handles.MainWindow,'graphs'));
+
 dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
 
 allDataNames = ["" dataFrameNamesAndTypes(1,:)];
@@ -262,11 +264,11 @@ stringAndLogicalDataNames =[""  dataFrameNamesAndTypes(1, dataFrameNamesAndTypes
 
 
 allMenuToDefaultState(handles);
-handles.HelpText.String = graphHelpStr(handles.GraphPopupmenu.Value);
+handles.HelpText.String = graphDescriptions(handles.GraphPopupmenu.Value);
 
 switch getMenuString(handles.GraphPopupmenu)
     
-    case graphs(1)
+    case graphs.hist.name
         
         imshow(getappdata(handles.MainWindow,'HistogramIcon'),...
             'Parent',handles.IconAxes);
@@ -290,7 +292,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.GraphAdditionalPopupMenu1.Visible = 'On';
         handles.GraphAdditionalPopupMenu1.String = {'Абсолютная','Нормированная'};
         
-    case graphs(2)
+    case graphs.scatterPlot.name
         
         imshow(getappdata(handles.MainWindow,'ScatterIcon'),...
             'Parent',handles.IconAxes);        
@@ -315,7 +317,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.uipanel1.Title = 'Зависимая выборка';
         handles.uipanel2.Title = 'Независимые выборки'; 
     
-    case graphs(3)  
+    case graphs.scatterPlotMatrix.name  
         
         imshow(getappdata(handles.MainWindow,'ScatterPlotMatrix'),...
             'Parent',handles.IconAxes); 
@@ -340,7 +342,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.uipanel1.Title = 'Выборки'; 
         handles.uipanel2.Title = 'Факторная выборка';
     
-    case graphs(4)
+    case graphs.pie.name
         
         imshow(getappdata(handles.MainWindow,'PieIcon'),...
             'Parent',handles.IconAxes);
@@ -350,7 +352,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.uipanel1.Title = 'Выборка';
         
-    case graphs(5)
+    case graphs.heatMap.name
         
         imshow(getappdata(handles.MainWindow,'HeatMapIcon'),...
             'Parent',handles.IconAxes);        
@@ -369,7 +371,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.uipanel1.Title = 'Зависимая выборка';
         handles.uipanel2.Title = 'Независимые выборки';
         
-    case graphs(6)
+    case graphs.corrMatrix.name
         
         imshow(getappdata(handles.MainWindow,'HeatMapIcon'),...
             'Parent',handles.IconAxes);        
@@ -393,7 +395,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.uipanel1.Title = 'Выборки'; 
         
-    case graphs(7)
+    case graphs.distributionDiagram.name
         
         imshow(getappdata(handles.MainWindow,'ErrorBarIcon'),...
             'Parent',handles.IconAxes);   
@@ -407,7 +409,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.uipanel1.Title = 'Зависимая выборка';
         handles.uipanel2.Title = 'Независимая выборка';
         
-    case graphs(8)
+    case graphs.catHist.name
         
         imshow(getappdata(handles.MainWindow,'HistogramIcon'),...
             'Parent',handles.IconAxes);      
@@ -419,10 +421,9 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.X1popupmenu.Enable = 'On'; 
         
         handles.uipanel1.Title = 'Зависимая выборка';
-        handles.uipanel2.Title = 'Независимая выборка';         
-    
-%   Выявление различий 1й числовой выборки
-    case graphs(9)
+        handles.uipanel2.Title = 'Независимая выборка'; 
+
+    case graphs.oneNumCriteria.name
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -450,7 +451,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.uipanel1.Title = 'Выборка';
     
-    case graphs(10)
+    case graphs.twoNumCriteria.name
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';
@@ -483,7 +484,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.uipanel1.Title = 'Выборки';
     
-    case graphs(11)
+    case graphs.threeNumCriteria.name
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';
@@ -534,7 +535,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.uipanel1.Title = 'Выборки';
         handles.uipanel2.Title = 'Факторная выборка';
     
-    case graphs(12)        
+    case graphs.multiAnova.name        
         
         handles.Y1popupmenu.String = numericDataNames;
         handles.Y1popupmenu.Enable = 'On';          
@@ -576,7 +577,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.uipanel2.Title = 'Факторные выборки';
         
 %     Выявление различий 1й дихотомической выборки    
-    case graphs(13)
+    case graphs.oneDichCriteria.name
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -598,7 +599,7 @@ switch getMenuString(handles.GraphPopupmenu)
     
         handles.uipanel1.Title = 'Выборка';
     
-    case graphs(14)
+    case graphs.twoDichCriteria.name
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -625,7 +626,7 @@ switch getMenuString(handles.GraphPopupmenu)
     
         handles.uipanel1.Title = 'Выборки';
         
-    case graphs(15)
+    case graphs.threeDichCriteria.name
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -659,7 +660,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         
 %     Выявление различий 2х номинативных выборок
-    case graphs(16)
+    case graphs.twoCatCriteria.name
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -679,7 +680,7 @@ switch getMenuString(handles.GraphPopupmenu)
     
         handles.uipanel1.Title = 'Выборки';
     
-    case graphs(17)
+    case graphs.threeCatCriteria.name
         
         handles.ValueLevelEdit.Visible = 'On';
         handles.ValueLevelText.Visible = 'On';        
@@ -712,7 +713,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.uipanel1.Title = 'Выборки';
         
     % таблица сопряженности
-    case graphs(18)
+    case graphs.crossTab.name
         
         handles.Y1popupmenu.String = stringAndLogicalDataNames;
         handles.Y2popupmenu.String = stringAndLogicalDataNames;
@@ -832,11 +833,12 @@ end
 
 function GraphAdditionalPopupMenu1_Callback(hObject, eventdata, handles)
 
-graphs = getappdata(handles.MainWindow,'graphs');
+
+graphNames = getGraphsNames(getappdata(handles.MainWindow,'graphs'));
 
 switch getMenuString(handles.GraphPopupmenu)
-    
-    case graphs(11)
+
+    case graphs.threeNumCriteria.name
         
         if getMenuString(handles.GraphAdditionalPopupMenu1) == 'Выборки независимы'
             handles.X1popupmenu.Enable = 'On';     
@@ -931,6 +933,7 @@ setFigureInCenter(graphFigure);
 graphFigure.Visible = 'off';
 
 graphs = getappdata(handles.MainWindow,'graphs');
+
 graphProperty = string(getMenuString(handles.GraphAdditionalPopupMenu1));
 originDataFrame = getappdata(handles.MainWindow,'dataFrame');
 dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
@@ -947,7 +950,7 @@ titleSuffix = "";
 
 switch getMenuString(handles.GraphPopupmenu)
     
-    case graphs(1)  
+    case graphs.hist.name  
         
         hold on;
         dataNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]);
@@ -967,7 +970,7 @@ switch getMenuString(handles.GraphPopupmenu)
         titleSuffix = "(" + graphProperty + ")";
         title({getMenuString(handles.GraphPopupmenu) titleSuffix});
         
-    case graphs(2)       
+    case graphs.scatterPlot.name       
         
         hold on;
         
@@ -990,7 +993,7 @@ switch getMenuString(handles.GraphPopupmenu)
         title(getMenuString(handles.GraphPopupmenu));
         
     
-    case graphs(3)    
+    case graphs.scatterPlotMatrix.name    
         
         hold on;
         
@@ -1016,7 +1019,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         title(getMenuString(handles.GraphPopupmenu));
         
-    case graphs(4)
+    case graphs.pie.name
         
         dataYName = getDataNames(handles, "Y1");   
         
@@ -1042,7 +1045,7 @@ switch getMenuString(handles.GraphPopupmenu)
         title({getMenuString(handles.GraphPopupmenu) titleSuffix});        
         
 
-    case graphs(5)
+    case graphs.heatMap.name
         
         hold on;
         colorDataName = getDataNames(handles, "Y1"); 
@@ -1084,7 +1087,7 @@ switch getMenuString(handles.GraphPopupmenu)
         xlabel(dataXName);
         ylabel(dataYName); 
             
-    case graphs(6)
+    case graphs.corrMatrix.name
         
         hold off;        
         dataYNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]); 
@@ -1110,7 +1113,7 @@ switch getMenuString(handles.GraphPopupmenu)
         graphFigure.Visible = 'On';
         return
         
-    case graphs(7)        
+    case graphs.distributionDiagram.name        
         
         hold on;
         dataYName = getDataNames(handles, "Y1");
@@ -1139,7 +1142,7 @@ switch getMenuString(handles.GraphPopupmenu)
         ylabel(dataYName);        
         title({getMenuString(handles.GraphPopupmenu) titleSuffix});
     
-    case graphs(8)
+    case graphs.catHist.name
         
         hold on;
         dataYName = getDataNames(handles, "Y1");
@@ -1176,7 +1179,16 @@ switch getMenuString(handles.GraphPopupmenu)
         
         
     %   Выявления различий
-    case {graphs{9}, graphs{10}, graphs{11}, graphs{13}, graphs{14}, graphs{15}, graphs{16}, graphs{17}}   
+    case {...
+            graphs.oneNumCriteria.name,...
+            graphs.twoNumCriteria.name,...
+            graphs.threeNumCriteria.name,...
+            graphs.oneDichCriteria.name,...
+            graphs.twoDichCriteria.name,...
+            graphs.threeDichCriteria.name, ...
+            graphs.twoCatCriteria.name, ...
+            graphs.threeCatCriteria.name...
+            }   
         
         dataYNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]); 
         
@@ -1207,7 +1219,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         switch getMenuString(handles.GraphPopupmenu)
            
-            case graphs(9)
+            case graphs.oneNumCriteria.name
                 
                 mu = getNumberFromEdit(handles.MuEdit);
                 
@@ -1223,7 +1235,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForOneSampleNumericData(...
                     datasets, significanceLevel, isDatasetsRanged, mu, tailStr);
                 
-            case graphs(10)
+            case graphs.twoNumCriteria.name
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                 isDatasetsRanged = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3));
@@ -1231,7 +1243,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForTwoSamplesNumericData(...
                     datasets, significanceLevel, isDatasetsRanged, isDatasetsIndependent, tailStr);
                 
-            case graphs(11)                                
+            case graphs.threeNumCriteria.name                                
                 
                 dataXName = getDataNames(handles, "X1");
                 groupData = createDatasetsForCriteria(dataFrame, dataFrameNamesAndTypes, dataXName);                
@@ -1260,7 +1272,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     datasets, significanceLevel, isDatasetsIndependentStr, isDatasetsRangedStr, cmprTypeStr, groupData);
                           
 % % %       
-            case graphs(13)
+            case graphs.oneDichCriteria.name
                 
                 supposedProbability = getNumberFromEdit(handles.MuEdit);                
                 
@@ -1276,7 +1288,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForOneSampleDichotomousData(...
                     datasets, significanceLevel, supposedProbability, tailStr);
                 
-            case graphs(14)
+            case graphs.twoDichCriteria.name
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                         
@@ -1285,9 +1297,9 @@ switch getMenuString(handles.GraphPopupmenu)
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
-                end
+                end    
                 
-                [datasets,emptyFlag] = replaceNanStrings(datasets);
+                [~,emptyFlag] = replaceNanStrings(datasets);
                 
                 if emptyFlag
                     errordlg('После удаления NaN одна или более выборок стали пустыми',...
@@ -1299,7 +1311,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForTwoSamplesDichotomousData(...
                     datasets, significanceLevel, isDatasetsIndependent, tailStr);
                 
-            case graphs(15)                
+            case graphs.threeDichCriteria.name                
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                               
@@ -1310,7 +1322,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     return
                 end                
                 
-                [datasets,emptyFlag] = replaceNanStrings(datasets);
+                [~,emptyFlag] = replaceNanStrings(datasets);
                 
                 if emptyFlag
                     errordlg('После удаления NaN одна или более выборок стали пустыми',...
@@ -1322,7 +1334,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForMultipleSamplesDichotomousData(...
                     datasets, significanceLevel, isDatasetsIndependent);
                 
-            case graphs(16)
+            case graphs.twoCatCriteria.name
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                     
@@ -1333,7 +1345,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     return
                 end        
                 
-                [datasets,emptyFlag] = replaceNanStrings(datasets);
+                [~,emptyFlag] = replaceNanStrings(datasets);
                 
                 if emptyFlag
                     errordlg('После удаления NaN одна или более выборок стали пустыми',...
@@ -1345,7 +1357,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 infoStr = calulateCriteriaForTwoSamplesCategoricalData(...
                     datasets, significanceLevel, isDatasetsIndependent);
                 
-            case graphs(17)
+            case graphs.threeCatCriteria.name
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                           
@@ -1356,7 +1368,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     return
                 end        
                 
-                [datasets,emptyFlag] = replaceNanStrings(datasets);
+                [~,emptyFlag] = replaceNanStrings(datasets);
                 
                 if emptyFlag
                     errordlg('После удаления NaN одна или более выборок стали пустыми',...
@@ -1372,7 +1384,7 @@ switch getMenuString(handles.GraphPopupmenu)
         
         printInfo(graphFigure, infoStr); 
                 
-    case graphs(12)
+    case graphs.multiAnova.name
         
         significanceLevel = getNumberFromEdit(handles.ValueLevelEdit);
                 
@@ -1410,7 +1422,7 @@ switch getMenuString(handles.GraphPopupmenu)
         printInfo(graphFigure, infoStr);        
         
     
-    case graphs(18)
+    case graphs.crossTab.name
     
         dataNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]);        
         

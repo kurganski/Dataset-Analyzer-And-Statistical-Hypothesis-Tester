@@ -58,7 +58,9 @@ if isDatasetsIndependent
     end  
     
 else
-        
+    
+    datasets = replaceNanStrings(datasets);
+                
     infoStr = [infoStr; "Выборки зависимы"];
     infoStr = [infoStr; ""];
     
