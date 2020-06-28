@@ -35,7 +35,8 @@ setappdata(handles.MainWindow,'HeatMapIcon',imread('HeatMapChart.png'));
 setappdata(handles.MainWindow,'ErrorBarIcon',imread('ErrorBarPlot.png'));
 setappdata(handles.MainWindow,'ScatterIcon',imread('ScatterPlot.png'));
 setappdata(handles.MainWindow,'PieIcon',imread('PieChart.png'));
-setappdata(handles.MainWindow,'ScatterPlotMatrix',imread('ScatterPlotMatrix.png'));
+setappdata(handles.MainWindow,'ScatterPlotMatrixIcon',imread('ScatterPlotMatrix.png'));
+setappdata(handles.MainWindow,'ScatterHistIcon',imread('ScatterHist.png'));
 
 setFigureInCenter(handles.MainWindow);
 setappdata(handles.MainWindow,'graphs',graphs);
@@ -48,6 +49,7 @@ setappdata(handles.MainWindow,'graphs',graphs);
 % точный для 3 дихотомических добавить
 % зависимые номинативные выборки критерий добавить
 % добавить хвосты и доверительные инервалы для дихотомиеских критериев
+% fitglm  mnrfit
 
 
 % USER DESCRIPTIONS
@@ -259,7 +261,11 @@ allDataNames = ["" dataFrameNamesAndTypes(1,:)];
 stringDataNames = ["" dataFrameNamesAndTypes(1,dataFrameNamesAndTypes(2,:)=="номинативный")];
 numericDataNames = ["" dataFrameNamesAndTypes(1,dataFrameNamesAndTypes(2,:)=="непрерывный")];
 logicalDataNames = ["" dataFrameNamesAndTypes(1,dataFrameNamesAndTypes(2,:)=="дихотомический")];
-stringAndLogicalDataNames =[""  dataFrameNamesAndTypes(1, dataFrameNamesAndTypes(2,:)=="номинативный" |...
+
+numericAndLogicalDataNames = [""  dataFrameNamesAndTypes(1, dataFrameNamesAndTypes(2,:)=="непрерывный" |...
+                                dataFrameNamesAndTypes(2,:)=="дихотомический")];
+
+stringAndLogicalDataNames = [""  dataFrameNamesAndTypes(1, dataFrameNamesAndTypes(2,:)=="номинативный" |...
                                 dataFrameNamesAndTypes(2,:)=="дихотомический")];
 
 
@@ -291,6 +297,22 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.GraphAdditionalPopupMenu1.Visible = 'On';
         handles.GraphAdditionalPopupMenu1.String = {'Абсолютная','Нормированная','Трехмерная'};
+    
+        
+    case graphs.catHist.name
+        
+        imshow(getappdata(handles.MainWindow,'HistogramIcon'),...
+            'Parent',handles.IconAxes);      
+        
+        handles.Y1popupmenu.String = numericDataNames;
+        handles.Y1popupmenu.Enable = 'On';
+        
+        handles.X1popupmenu.String = stringAndLogicalDataNames;        
+        handles.X1popupmenu.Enable = 'On'; 
+        
+        handles.uipanel1.Title = 'Выборка';
+        handles.uipanel2.Title = 'Факторная выборка'; 
+        
         
     case graphs.scatterPlot.name
         
@@ -316,14 +338,67 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.uipanel1.Title = 'Зависимая выборка';
         handles.uipanel2.Title = 'Независимые выборки'; 
+        
+    case graphs.catScatter.name
+        
+        imshow(getappdata(handles.MainWindow,'ScatterIcon'),...
+            'Parent',handles.IconAxes);  
+        
+        handles.Y1popupmenu.String = numericDataNames;
+        handles.Y1popupmenu.Enable = 'On';
+        
+        handles.Y2popupmenu.String = numericDataNames;
+        handles.Y2popupmenu.Enable = 'On';        
+        
+        handles.X1popupmenu.String = stringAndLogicalDataNames;
+        handles.X1popupmenu.Enable = 'On';
+        
+        handles.uipanel1.Title = 'Выборки';
+        handles.uipanel2.Title = 'Факторная выборка'; 
+        
+        
+    case graphs.scatterHist.name
+        
+        imshow(getappdata(handles.MainWindow,'ScatterHistIcon'),...
+            'Parent',handles.IconAxes);  
+        
+        handles.Y1popupmenu.String = numericDataNames;
+        handles.Y1popupmenu.Enable = 'On';
+        
+        handles.Y2popupmenu.String = numericDataNames;
+        handles.Y2popupmenu.Enable = 'On';        
+        
+        handles.X1popupmenu.String = stringAndLogicalDataNames;
+        handles.X1popupmenu.Enable = 'On';
+        
+        handles.uipanel1.Title = 'Выборки';
+        handles.uipanel2.Title = 'Факторная выборка';         
+        
     
     case graphs.scatterPlotMatrix.name  
         
-        imshow(getappdata(handles.MainWindow,'ScatterPlotMatrix'),...
+        imshow(getappdata(handles.MainWindow,'ScatterPlotMatrixIcon'),...
             'Parent',handles.IconAxes); 
         
-        handles.X1popupmenu.String = allDataNames;
+        handles.MuText.Visible = 'On';        
+        handles.MuText.String = 'Факторная выборка';
+        
+        handles.GraphAdditionalPopupMenu2.Visible = 'On';
+        handles.GraphAdditionalPopupMenu2.String = allDataNames; 
+        
+        handles.X1popupmenu.String = numericDataNames;
+        handles.X2popupmenu.String = numericDataNames;
+        handles.X3popupmenu.String = numericDataNames;
+        handles.X4popupmenu.String = numericDataNames;
+        handles.X5popupmenu.String = numericDataNames;
+        handles.X6popupmenu.String = numericDataNames;
+        
         handles.X1popupmenu.Enable = 'On';
+        handles.X2popupmenu.Enable = 'On';
+        handles.X3popupmenu.Enable = 'On';
+        handles.X4popupmenu.Enable = 'On';
+        handles.X5popupmenu.Enable = 'On';
+        handles.X6popupmenu.Enable = 'On'; 
         
         handles.Y1popupmenu.String = numericDataNames;
         handles.Y2popupmenu.String = numericDataNames;
@@ -339,8 +414,8 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y5popupmenu.Enable = 'On';
         handles.Y6popupmenu.Enable = 'On';  
         
-        handles.uipanel1.Title = 'Выборки'; 
-        handles.uipanel2.Title = 'Факторная выборка';
+        handles.uipanel1.Title = 'Выборки по оси ординат'; 
+        handles.uipanel2.Title = 'Выборки по оси абцисс';
     
     case graphs.pie.name
         
@@ -390,10 +465,25 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y5popupmenu.Enable = 'On';
         handles.Y6popupmenu.Enable = 'On';  
         
+        handles.X1popupmenu.String = numericDataNames;
+        handles.X2popupmenu.String = numericDataNames;
+        handles.X3popupmenu.String = numericDataNames;
+        handles.X4popupmenu.String = numericDataNames;
+        handles.X5popupmenu.String = numericDataNames;
+        handles.X6popupmenu.String = numericDataNames;
+        
+        handles.X1popupmenu.Enable = 'On';
+        handles.X2popupmenu.Enable = 'On';
+        handles.X3popupmenu.Enable = 'On';
+        handles.X4popupmenu.Enable = 'On';
+        handles.X5popupmenu.Enable = 'On';
+        handles.X6popupmenu.Enable = 'On'; 
+        
         handles.GraphAdditionalPopupMenu1.Visible = 'On';
         handles.GraphAdditionalPopupMenu1.String = {'Пирсона','Кендалла','Спирмена'};  
         
-        handles.uipanel1.Title = 'Выборки'; 
+        handles.uipanel1.Title = 'Выборки по оси ординат'; 
+        handles.uipanel2.Title = 'Выборки по оси абцисс';
         
     case graphs.distributionDiagram.name
         
@@ -406,22 +496,8 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.X1popupmenu.String = stringAndLogicalDataNames;        
         handles.X1popupmenu.Enable = 'On';
         
-        handles.uipanel1.Title = 'Зависимая выборка';
-        handles.uipanel2.Title = 'Независимая выборка';
-        
-    case graphs.catHist.name
-        
-        imshow(getappdata(handles.MainWindow,'HistogramIcon'),...
-            'Parent',handles.IconAxes);      
-        
-        handles.Y1popupmenu.String = numericDataNames;
-        handles.Y1popupmenu.Enable = 'On';
-        
-        handles.X1popupmenu.String = stringAndLogicalDataNames;        
-        handles.X1popupmenu.Enable = 'On'; 
-        
-        handles.uipanel1.Title = 'Зависимая выборка';
-        handles.uipanel2.Title = 'Независимая выборка'; 
+        handles.uipanel1.Title = 'Выборка';
+        handles.uipanel2.Title = 'Факторная выборка';
 
     case graphs.oneNumCriteria.name
         
@@ -573,7 +649,7 @@ switch getMenuString(handles.GraphPopupmenu)
             'Сравнение: Шеффи'....
             };
         
-        handles.uipanel1.Title = 'Зависимая выборка';
+        handles.uipanel1.Title = 'Выборка';
         handles.uipanel2.Title = 'Факторные выборки';
         
 %     Выявление различий 1й дихотомической выборки    
@@ -731,7 +807,53 @@ switch getMenuString(handles.GraphPopupmenu)
     
         handles.uipanel1.Title = 'Выборки'; 
          
+    case graphs.logitregression.name
+                
+        handles.MuText.Visible = 'On';        
+        handles.MuText.String = 'Зависимая переменная';
         
+        handles.GraphAdditionalPopupMenu2.Visible = 'On';
+        handles.GraphAdditionalPopupMenu2.String = stringAndLogicalDataNames;   
+        
+        handles.GraphAdditionalPopupMenu3.Visible = 'Off';
+        handles.GraphAdditionalPopupMenu3.String = {...
+            'Использовать взаимодействия',...
+            'Не использовать взаимодействия'...
+            };   
+        
+        handles.Y1popupmenu.String = numericAndLogicalDataNames;
+        handles.Y2popupmenu.String = numericAndLogicalDataNames;
+        handles.Y3popupmenu.String = numericAndLogicalDataNames;
+        handles.Y4popupmenu.String = numericAndLogicalDataNames;
+        handles.Y5popupmenu.String = numericAndLogicalDataNames;
+        handles.Y6popupmenu.String = numericAndLogicalDataNames;
+        
+        handles.Y1popupmenu.Enable = 'On';
+        handles.Y2popupmenu.Enable = 'On';
+        handles.Y3popupmenu.Enable = 'On';
+        handles.Y4popupmenu.Enable = 'On';
+        handles.Y5popupmenu.Enable = 'On';
+        handles.Y6popupmenu.Enable = 'On';   
+        
+        handles.X1popupmenu.String = numericAndLogicalDataNames;
+        handles.X2popupmenu.String = numericAndLogicalDataNames;
+        handles.X3popupmenu.String = numericAndLogicalDataNames;
+        handles.X4popupmenu.String = numericAndLogicalDataNames;
+        handles.X5popupmenu.String = numericAndLogicalDataNames;
+        handles.X6popupmenu.String = numericAndLogicalDataNames;
+        
+        handles.X1popupmenu.Enable = 'On';
+        handles.X2popupmenu.Enable = 'On';
+        handles.X3popupmenu.Enable = 'On';
+        handles.X4popupmenu.Enable = 'On';
+        handles.X5popupmenu.Enable = 'On';
+        handles.X6popupmenu.Enable = 'On';  
+    
+        handles.uipanel1.Title = 'Предикторы'; 
+        handles.uipanel2.Title = 'Предикторы'; 
+        
+        
+         
     otherwise
         
         assert(0,'некорректное значение графика');
@@ -871,9 +993,32 @@ switch getMenuString(handles.GraphPopupmenu)
             assert(0,'некорректное значение свойства графика');   
         end
         
-        
     otherwise
         
+end
+
+
+function GraphAdditionalPopupMenu2_Callback(hObject, eventdata, handles)
+
+graphs = getappdata(handles.MainWindow,'graphs');
+
+switch getMenuString(handles.GraphPopupmenu)
+
+    case graphs.logitregression.name        
+        
+        dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
+        responseName = getMenuString(handles.GraphAdditionalPopupMenu2); 
+        
+        if dataFrameNamesAndTypes(2, dataFrameNamesAndTypes(1,:) == responseName) == "дихотомический"
+            handles.GraphAdditionalPopupMenu3.Visible = 'on';
+        else
+            handles.GraphAdditionalPopupMenu3.Visible = 'off';
+        end
+        
+
+    otherwise
+        
+        assert(0,'некорректное значение графика');         
 end
 
 
@@ -1004,7 +1149,44 @@ switch getMenuString(handles.GraphPopupmenu)
         end
         
         title(gca,{getMenuString(handles.GraphPopupmenu) titleSuffix});
+    
         
+    case graphs.catHist.name
+        
+        hold on;
+        dataYName = getDataNames(handles, "Y1");
+        dataXName = getDataNames(handles, "X1"); 
+        
+        if isempty(dataXName) || isempty(dataYName)
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
+            delete(graphFigure);
+            return            
+        end 
+        
+        dataY = retrieveData(dataFrame, dataFrameNamesAndTypes, dataYName);
+        dataX = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName);      
+        dataX = replaceNaN(dataX);
+        
+        if isempty(dataX)
+            errordlg('Выберите не пустую выборку', ...
+                'Ошибка задания данных','modal');            
+            delete(graphFigure);
+            return;
+        end
+        
+        uniqueXdata = unique(dataX);  
+        uniqueXdata(uniqueXdata == "") = " ";
+                
+        for x = 1:length(uniqueXdata)                
+            category = dataY(dataX == uniqueXdata(x));             
+            histogram(category, 'DisplayName', uniqueXdata(x));            
+        end
+        
+        xlabel(dataYName);
+        legend('show');   
+        title({getMenuString(handles.GraphPopupmenu) titleSuffix});
+        
+            
     case graphs.scatterPlot.name       
         
         hold on;
@@ -1027,29 +1209,94 @@ switch getMenuString(handles.GraphPopupmenu)
         ylabel(dataYName);
         title(getMenuString(handles.GraphPopupmenu));
         
-    
+    case graphs.catScatter.name
+        
+        hold on;
+        
+        dataYName = getDataNames(handles, "Y1");
+        dataXName = getDataNames(handles, "Y2");
+        groupName = getDataNames(handles, "X1");
+        
+        if isempty(dataXName) || isempty(dataYName) || isempty(groupName)
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
+            delete(graphFigure);
+            return            
+        end        
+        
+        dataY = retrieveData(dataFrame, dataFrameNamesAndTypes, dataYName);
+        dataX = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName); 
+        group = retrieveData(dataFrame, dataFrameNamesAndTypes, groupName); 
+        
+        if isnumeric(group)
+            dataX(isnan(group)) = [];
+            dataY(isnan(group)) = [];
+            group(isnan(group)) = [];            
+        else
+            dataX(group == "") = [];
+            dataY(group == "") = [];
+            group(group == "") = [];
+        end
+        
+        gscatter(dataX,dataY,group,[],[],[],'on',dataXName,dataYName);
+        title(getMenuString(handles.GraphPopupmenu));
+        
+    case graphs.scatterHist.name        
+        
+        hold on;
+        
+        dataYName = getDataNames(handles, "Y1");
+        dataXName = getDataNames(handles, "Y2");
+        groupName = getDataNames(handles, "X1");
+        
+        if isempty(dataXName) || isempty(dataYName) || isempty(groupName)
+            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
+            delete(graphFigure);
+            return            
+        end        
+        
+        dataY = retrieveData(dataFrame, dataFrameNamesAndTypes, dataYName);
+        dataX = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName); 
+        group = retrieveData(dataFrame, dataFrameNamesAndTypes, groupName);         
+       
+        if isnumeric(group)
+            dataX(isnan(group)) = [];
+            dataY(isnan(group)) = [];
+            group(isnan(group)) = [];            
+        else
+            dataX(group == "") = [];
+            dataY(group == "") = [];
+            group(group == "") = [];
+        end
+        
+        scatterhist(dataX,dataY,'Group',group,'Kernel','on')
+        title(getMenuString(handles.GraphPopupmenu));
+        xlabel(dataXName);
+        ylabel(dataYName);
+        
     case graphs.scatterPlotMatrix.name    
         
         hold on;
         
-        dataNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]);        
-        groupName = getDataNames(handles, "X1");
+        dataYNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]); 
+        dataXNames = getDataNames(handles, ["X1","X2","X3","X4","X5","X6"]);       
+        groupName = getMenuString(handles.GraphAdditionalPopupMenu1);
         
-        if isempty(dataNames) || isempty(groupName)
+        if isempty(dataYNames) || isempty(dataXNames) || isempty(groupName)
             errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end
         
-        data = retrieveData(dataFrame, dataFrameNamesAndTypes, dataNames);
+        dataX = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXNames);
+        dataY = retrieveData(dataFrame, dataFrameNamesAndTypes, dataYNames);
         group = retrieveData(dataFrame, dataFrameNamesAndTypes, groupName);
         
         % грязный хак, почему то не видит окно с осью, если запускать со
         % старта приложения
         try
-            gplotmatrix(data, [], group,[],[],[],[],[],cellstr(dataNames));        
+            gplotmatrix(dataX, dataY, group,[],[],[],[],[],cellstr(dataXNames),cellstr(dataYNames));        
         catch
-            gplotmatrix(data, [], group,[],[],[],[],[],cellstr(dataNames));
+            gplotmatrix(dataX, dataY, group,[],[],[],[],[],cellstr(dataXNames),cellstr(dataYNames));
         end
         
         title(getMenuString(handles.GraphPopupmenu));
@@ -1068,7 +1315,7 @@ switch getMenuString(handles.GraphPopupmenu)
         data = replaceNaN(data);
         
         if isempty(data)
-            errordlg('Выбранные данные содержат пустые столбцы. Выберите другие данные', ...
+            errordlg('Выберите не пустую выборку', ...
                 'Ошибка данных','modal');
             delete(graphFigure);
             return;
@@ -1100,7 +1347,7 @@ switch getMenuString(handles.GraphPopupmenu)
         dataY = replaceNaN(dataY);
         
         if isempty(dataX) || isempty(dataY)
-            errordlg('Выбранные данные содержат пустые столбцы. Выберите другие данные',...
+            errordlg('Выберите не пустые выборки',...
                 'Ошибка задания данных','modal');            
             delete(graphFigure);
             return;
@@ -1126,24 +1373,26 @@ switch getMenuString(handles.GraphPopupmenu)
         
         hold off;        
         dataYNames = getDataNames(handles, ["Y1","Y2","Y3","Y4","Y5","Y6"]); 
+        dataXNames = getDataNames(handles, ["X1","X2","X3","X4","X5","X6"]);  
         
-        if isempty(dataYNames)
+        if isempty(dataYNames) || isempty(dataXNames) 
             errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end
                 
         dataY = retrieveData(dataFrame, dataFrameNamesAndTypes, dataYNames);
+        dataX = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXNames);
         method = getDictValue(graphProperty);        
         
-        [corrCoeffs, pValues] = corr(dataY, dataY, 'type', method, 'rows', 'pairwise');
+        [corrCoeffs, pValues] = corr(dataX, dataY, 'type', method, 'rows', 'pairwise');
         
         subplot(2,1,1)
-        heatmap(dataYNames, dataYNames, corrCoeffs);         
+        heatmap(dataXNames, dataYNames, corrCoeffs);         
         title({getMenuString(handles.GraphPopupmenu) "Коэффициенты " + graphProperty});
         
         subplot(2,1,2)
-        heatmap(dataYNames, dataYNames, pValues);  
+        heatmap(dataXNames, dataYNames, pValues);  
         title({getMenuString(handles.GraphPopupmenu) 'Значения p'});
         graphFigure.Visible = 'On';
         return
@@ -1151,67 +1400,32 @@ switch getMenuString(handles.GraphPopupmenu)
     case graphs.distributionDiagram.name        
         
         hold on;
-        dataYName = getDataNames(handles, "Y1");
-        dataXName = getDataNames(handles, "X1");         
+        dataName = getDataNames(handles, "Y1");
+        groupName = getDataNames(handles, "X1");         
         
-        if isempty(dataXName) || isempty(dataYName)
+        if isempty(groupName) || isempty(dataName)
             errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
             delete(graphFigure);
             return            
         end         
         
-        dataY = retrieveData(dataFrame, dataFrameNamesAndTypes, dataYName);
-        dataX = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName); 
+        data = retrieveData(dataFrame, dataFrameNamesAndTypes, dataName);
+        group = retrieveData(dataFrame, dataFrameNamesAndTypes, groupName); 
         
-        if isempty(dataX)
-            errordlg('Выбранные данные содержат пустые столбцы. Выберите другие данные',...
+        if isempty(group)
+            errordlg('Выберите не пустую выборку',...
                 'Ошибка задания данных','modal');            
             delete(graphFigure);
             return;
         end
         
-        buildErrorBar(dataY, dataX, gca); 
+        boxplot(data, group);
         
-        xlabel(dataXName);
-        xtickangle(gca, 45)
-        ylabel(dataYName);        
+        xlabel(groupName);
+        xtickangle(gca, 45);
+        ylabel(dataName);        
         title({getMenuString(handles.GraphPopupmenu) titleSuffix});
     
-    case graphs.catHist.name
-        
-        hold on;
-        dataYName = getDataNames(handles, "Y1");
-        dataXName = getDataNames(handles, "X1"); 
-        
-        if isempty(dataXName) || isempty(dataYName)
-            errordlg('Выберите данные для графика','Ошибка задания данных','modal');                    
-            delete(graphFigure);
-            return            
-        end 
-        
-        dataY = retrieveData(dataFrame, dataFrameNamesAndTypes, dataYName);
-        dataX = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName);      
-        dataX = replaceNaN(dataX);
-        
-        if isempty(dataX)
-            errordlg('Выбранные данные содержат пустые столбцы. Выберите другие данные', ...
-                'Ошибка задания данных','modal');            
-            delete(graphFigure);
-            return;
-        end
-        
-        uniqueXdata = unique(dataX);  
-        uniqueXdata(uniqueXdata == "") = " ";
-                
-        for x = 1:length(uniqueXdata)                
-            category = dataY(dataX == uniqueXdata(x));             
-            histogram(category, 'DisplayName', uniqueXdata(x));            
-        end
-        
-        xlabel(dataYName);
-        legend('show');   
-        title({getMenuString(handles.GraphPopupmenu) titleSuffix});
-        
         
     %   Выявления различий
     case {...
@@ -1476,6 +1690,50 @@ switch getMenuString(handles.GraphPopupmenu)
         delete(graphFigure);
         return 
     
+    case graphs.logitregression.name        
+        
+        responseName = getMenuString(handles.GraphAdditionalPopupMenu2); 
+        interactionsMode = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3));
+        predictorsNames = getDataNames(handles,...
+                        ["X1","X2","X3","X4","X5","X6","Y1","Y2","Y3","Y4","Y5","Y6"]); 
+        
+        if isempty(responseName) || responseName == ""
+            errordlg('Выберите зависимую переменную','Ошибка задания данных','modal');                    
+            delete(graphFigure);
+            return            
+        end        
+        
+        if isempty(predictorsNames)
+            errordlg('Выберите предикторы',...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end          
+        
+        response = retrieveData(dataFrame, dataFrameNamesAndTypes, responseName);
+        predictors = retrieveData(dataFrame, dataFrameNamesAndTypes, predictorsNames); 
+        
+        if dataFrameNamesAndTypes(2, dataFrameNamesAndTypes(1,:) == responseName) == "дихотомический"
+            isBinaryResponse = true;
+        else
+            isBinaryResponse = false;
+        end
+                
+        [~,emptyFlag] = replaceNanStrings([predictors, response]);
+                
+        if emptyFlag
+            errordlg('После удаления NaN не осталось наблюдений. Выберите другие выборки',...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end                
+                
+        infoTable = calculateLogit(predictors, response, interactionsMode, isBinaryResponse, predictorsNames);
+        
+        showLogitTable(infoTable, responseName);        
+        delete(graphFigure);
+        return
+        
     otherwise
         
         assert(0,'некорректное значение графика');       
@@ -1483,3 +1741,6 @@ end
         
 graphFigure.Visible = 'On';
     
+
+
+

@@ -68,6 +68,7 @@ popupmenu6 = uicontrol(crossTabFigure, ...
 if size(labels,2) > 2
     data = labels(:,3);
     data(strcmp('',data)) = [];
+    data = data(~cellfun('isempty',data));
     
     popupmenu3.String = data;
     popupmenu3.Visible = 'On';
@@ -86,6 +87,7 @@ if size(labels,2) > 3
     
     data = labels(:,4);
     data(strcmp('',data)) = [];
+    data = data(~cellfun('isempty',data));
     
     popupmenu4.String = data;
     popupmenu4.Visible = 'On';
@@ -105,6 +107,7 @@ if size(labels,2) > 4
     
     data = labels(:,5);
     data(strcmp('',data)) = [];
+    data = data(~cellfun('isempty',data));
     
     popupmenu5.String = data;
     popupmenu5.Visible = 'On';
@@ -124,6 +127,7 @@ if size(labels,2) > 5
     
     data = labels(:,6);
     data(strcmp('',data)) = [];
+    data = data(~cellfun('isempty',data));
     
     popupmenu6.String = data;
     popupmenu6.Visible = 'On';
@@ -146,11 +150,10 @@ textLabel.String = "Значение хи-квадрат: " + num2str(chi2) + ...
                     "; Значение вероятности p: " + num2str(p);
 
 titleLabel = uicontrol(crossTabFigure,'Style','text','Units', 'pixels',...
-                                        'Position', [1 455 1000 40],'FontSize',10);
+                                        'Position', [1 455 1000 40],'FontSize',12);
 
 titleLabel.String = "Таблица сопряженности выборок '" + datasetsNames(1) + ...
                         "' и '" + datasetsNames(2) + "'";
-titleLabel.FontSize = 12;
 
 crossTabTable = uitable(crossTabFigure,'Units', 'pixels', ...
                                         'Position',[1 50 750 400], 'FontSize',10);
