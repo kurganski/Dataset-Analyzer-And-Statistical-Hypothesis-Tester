@@ -1,4 +1,4 @@
-function infoStr = calulateCriteriaForMultipleSamplesNumericData( ...
+function infoStr = calculateCriteriaForMultipleSamplesNumericData( ...
                datasets, significanceLevel, isDatasetsIndependentStr, ...
                isDatasetsRangedStr, cmprTypeStr, groupData)
 
@@ -31,8 +31,6 @@ if ~isDatasetsRanged
             break;
         end        
     end
-    
-    
 end
 
 isAllVarianceEqual = false;
@@ -50,10 +48,6 @@ dataForAnova = groupDataForAnova(datasets);
 handle = figure('Position',[50 50 850 550], 'Visible','off');
 setFigureInCenter(handle);
 
-%%% TEST - remove later
-% isAllNormalDistribution = true;
-%%% TEST - remove later
-
 if isDatasetsIndependent
       
     infoStr = [infoStr; "Выборки независимы"];
@@ -67,11 +61,9 @@ if isDatasetsIndependent
         infoStr = [infoStr; ""];
         
         if isempty(groupData)
-            [~,~,stats] = anova1(replaceNanStrings(dataForAnova));
+            [~,~,stats] = anova1(dataForAnova);
             stats.gnames = {datasets(:).name}';
-        else
-            dataForAnova(groupData.dataset == "") = [];
-            groupData.dataset(groupData.dataset == "") = [];            
+        else           
             [~,~,stats] = anova1(dataForAnova, groupData.dataset);            
         end
         
@@ -99,11 +91,9 @@ if isDatasetsIndependent
         infoStr = [infoStr; ""];
         
         if isempty(groupData)
-            [~,~,stats] = kruskalwallis(replaceNanStrings(dataForAnova));
+            [~,~,stats] = kruskalwallis(dataForAnova);
             stats.gnames = {datasets(:).name}';
-        else
-            dataForAnova(groupData.dataset == "") = [];
-            groupData.dataset(groupData.dataset == "") = [];     
+        else   
             [~,~,stats] = kruskalwallis(dataForAnova, groupData.dataset);            
         end
                             

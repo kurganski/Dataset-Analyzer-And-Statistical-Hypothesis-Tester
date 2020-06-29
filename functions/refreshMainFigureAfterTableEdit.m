@@ -1,9 +1,10 @@
 function refreshMainFigureAfterTableEdit( handles, dataFrameNamesAndTypes )
 
-graphHelpStr = getappdata(handles.MainWindow,'graphHelpStr');
+graphDescriptions = getGraphsDescriptions(getappdata(handles.MainWindow,'graphs'));
+
 allMenuToDefaultState(handles);
 
-handles.HelpText.String = graphHelpStr(1);
+handles.HelpText.String = graphDescriptions(1);
 handles.GraphPopupmenu.Value = 1;
 
 numericDataNames = ["" dataFrameNamesAndTypes(1,dataFrameNamesAndTypes(2,:)=="числовой")];

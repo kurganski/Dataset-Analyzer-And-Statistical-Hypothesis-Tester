@@ -49,7 +49,6 @@ setappdata(handles.MainWindow,'graphs',graphs);
 % точный для 3 дихотомических добавить
 % зависимые номинативные выборки критерий добавить
 % добавить хвосты и доверительные инервалы для дихотомиеских критериев
-% fitglm  mnrfit
 
 
 % USER DESCRIPTIONS
@@ -250,7 +249,6 @@ msgbox (...
 
 
 function GraphPopupmenu_Callback(hObject, eventdata, handles)
-
 
 graphs = getappdata(handles.MainWindow,'graphs');
 graphDescriptions = getGraphsDescriptions(getappdata(handles.MainWindow,'graphs'));
@@ -1481,7 +1479,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 
                 isDatasetsRanged = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3));
                 
-                infoStr = calulateCriteriaForOneSampleNumericData(...
+                infoStr = calculateCriteriaForOneSampleNumericData(...
                     datasets, significanceLevel, isDatasetsRanged, mu, tailStr);
                 
             case graphs.twoNumCriteria.name
@@ -1489,7 +1487,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                 isDatasetsRanged = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3));
                 
-                infoStr = calulateCriteriaForTwoSamplesNumericData(...
+                infoStr = calculateCriteriaForTwoSamplesNumericData(...
                     datasets, significanceLevel, isDatasetsRanged, isDatasetsIndependent, tailStr);
                 
             case graphs.threeNumCriteria.name                                
@@ -1517,7 +1515,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     return
                 end              
                 
-                infoStr = calulateCriteriaForMultipleSamplesNumericData(...
+                infoStr = calculateCriteriaForMultipleSamplesNumericData(...
                     datasets, significanceLevel, isDatasetsIndependentStr, isDatasetsRangedStr, cmprTypeStr, groupData);
                           
 % % %       
@@ -1534,7 +1532,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 
                 datasets(1).dataset = replaceNaN(datasets(1).dataset);
                 
-                infoStr = calulateCriteriaForOneSampleDichotomousData(...
+                infoStr = calculateCriteriaForOneSampleDichotomousData(...
                     datasets, significanceLevel, supposedProbability, tailStr);
                 
             case graphs.twoDichCriteria.name
@@ -1557,7 +1555,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     return                    
                 end
                 
-                infoStr = calulateCriteriaForTwoSamplesDichotomousData(...
+                infoStr = calculateCriteriaForTwoSamplesDichotomousData(...
                     datasets, significanceLevel, isDatasetsIndependent, tailStr);
                 
             case graphs.threeDichCriteria.name                
@@ -1580,7 +1578,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     return                    
                 end
                 
-                infoStr = calulateCriteriaForMultipleSamplesDichotomousData(...
+                infoStr = calculateCriteriaForMultipleSamplesDichotomousData(...
                     datasets, significanceLevel, isDatasetsIndependent);
                 
             case graphs.twoCatCriteria.name
@@ -1603,7 +1601,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     return                    
                 end
                 
-                infoStr = calulateCriteriaForTwoSamplesCategoricalData(...
+                infoStr = calculateCriteriaForTwoSamplesCategoricalData(...
                     datasets, significanceLevel, isDatasetsIndependent);
                 
             case graphs.threeCatCriteria.name
@@ -1626,7 +1624,7 @@ switch getMenuString(handles.GraphPopupmenu)
                     return                    
                 end
                 
-                infoStr = calulateCriteriaForMultipleSamplesCategoricalData(...
+                infoStr = calculateCriteriaForMultipleSamplesCategoricalData(...
                     datasets, significanceLevel, isDatasetsIndependent);
                 
         end               
@@ -1667,7 +1665,7 @@ switch getMenuString(handles.GraphPopupmenu)
         dataY = createDatasetsForCriteria(dataFrame, dataFrameNamesAndTypes, dataYName);
         datasets = createDatasetsForCriteria(dataFrame, dataFrameNamesAndTypes, dataXNames);
         
-        infoStr = calulateAnovan(dataY, datasets, sstypeStr, significanceLevel, cmprTypeStr);
+        infoStr = calculateAnovan(dataY, datasets, sstypeStr, significanceLevel, cmprTypeStr);
         printInfo(graphFigure, infoStr);        
         
     
