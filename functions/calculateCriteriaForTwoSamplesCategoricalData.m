@@ -37,7 +37,7 @@ if isDatasetsIndependent
     
 else
     
-    datasets = replaceNanStrings(datasets);
+    datasets = insertMissing(datasets);
     infoStr = [infoStr; "Выборки зависимы"];
     infoStr = [infoStr; ""];
     

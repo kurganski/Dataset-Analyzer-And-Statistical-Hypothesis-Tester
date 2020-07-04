@@ -25,7 +25,7 @@ if isDatasetsIndependent
         infoStr = [infoStr; "¬ыборки большие"];
         infoStr = [infoStr; ""];
         
-        [h,p,ci,zval] = ztest2(datasets, significanceLevel, tail);
+        [h,p,~,zval] = ztest2(datasets, significanceLevel, tail);
         
         infoStr = [infoStr; "ѕримененный критерий: двухвыборочный z-критерий с поправкой …ейтса (two-sample z-Test)"];
         infoStr = [infoStr; "Ќулева€ гипотеза: выборки не имеют неслучайных зависимостей: " + getHypothesisResultStr(h)];
@@ -35,9 +35,6 @@ if isDatasetsIndependent
         
         infoStr = [infoStr; "p-значение: " + num2str(p)];
         infoStr = [infoStr; "«начение критери€: " + num2str(zval)];
-        infoStr = [infoStr; "ƒоверительный интервал: " + num2str(ci(1)) + "..." + num2str(ci(2))];
-        infoStr = [infoStr; "—реднее значение дл€ доверительного интервала = (m1 + m2)/(n1 + n2),"];
-        infoStr = [infoStr; "где m1 и m2 - количество '1' в выборках, n1 и n2 - размеры выборок"];
     
     else
         

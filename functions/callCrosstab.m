@@ -1,7 +1,5 @@
 function [tbl,chi2,p,labels] = callCrosstab( datasets )
 
-% datasets = replaceNanStrings(datasets);
-
 switch size(datasets,2)
     
     case 2

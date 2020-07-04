@@ -48,11 +48,15 @@ setappdata(handles.MainWindow,'graphs',graphs);
 % точный Кохрена сделать
 % точный для 3 дихотомических добавить
 % зависимые номинативные выборки критерий добавить
-% добавить хвосты и доверительные инервалы для дихотомиеских критериев
+% добавить хвосты и доверительные инервалы для дихотомиеских критериев и
+% z-критерия 
+% 
+% в отдельной ветке попробовать перейти на category data type
 
 
 % USER DESCRIPTIONS
 % 
+% добавь версию ПО !
 
 
 % CODE REFACTOR
@@ -229,16 +233,17 @@ function AboutMenu_Callback(hObject, eventdata, handles)
 msgbox (...
     {...
     "Dataset Analyzer And Statistical Hypothesis Tester" ;...
-    "Версия: 0.5" ;...
+    "Версия: 1.1" ;...
     "" ;...
     "Приложение предназначено для визуализации и анализа табличных данных.";...
     "Основные особенности:" ;...
     " - поддержка xls, xlsx, csv файлов;" ;...
     " - отображение загруженной таблицы данных;" ;...
+    " - добавление столбцов-фич с помощью фильтров" ;...
     " - построение графиков и диаграмм для анализа данных;" ;...
     " - автоматический подбор и расчет критериев проверки статистических гипотез о различии выборок;" ;...
     " - встроенная справка по графикам и диаграммам;" ;...
-    " - применение до 3 фильтров к анализируемым данным;" ;...
+    " - применение до 5 фильтров к анализируемым данным." ;...
     "" ;...
     "" ;...
     "Автор: Курганский Андрей Андреевич (k-and92@mail.ru)" ;...
@@ -556,7 +561,11 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y2popupmenu.String = numericDataNames;        
         handles.Y1popupmenu.Enable = 'On';  
         
+        handles.X1popupmenu.String = logicalDataNames;        
+        handles.X1popupmenu.Enable = 'On';
+        
         handles.uipanel1.Title = 'Выборки';
+        handles.uipanel2.Title = 'Факторная выборка';
     
     case graphs.threeNumCriteria.name
         
@@ -603,7 +612,7 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y6popupmenu.String = numericDataNames;
         handles.Y6popupmenu.Enable = 'On'; 
         
-        handles.X1popupmenu.String = stringAndLogicalDataNames;        
+        handles.X1popupmenu.String = stringDataNames;        
         handles.X1popupmenu.Enable = 'On'; 
         
         handles.uipanel1.Title = 'Выборки';
@@ -697,7 +706,11 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y2popupmenu.String = logicalDataNames;
         handles.Y2popupmenu.Enable = 'On'; 
-    
+        
+        handles.X1popupmenu.String = logicalDataNames;        
+        handles.X1popupmenu.Enable = 'On';
+        
+        handles.uipanel2.Title = 'Факторная выборка';    
         handles.uipanel1.Title = 'Выборки';
         
     case graphs.threeDichCriteria.name
@@ -729,7 +742,11 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y6popupmenu.String = logicalDataNames;
         handles.Y6popupmenu.Enable = 'On'; 
+        
+        handles.X1popupmenu.String = stringDataNames;        
+        handles.X1popupmenu.Enable = 'On';
     
+        handles.uipanel2.Title = 'Факторная выборка';
         handles.uipanel1.Title = 'Выборки';
         
         
@@ -751,7 +768,11 @@ switch getMenuString(handles.GraphPopupmenu)
         
         handles.Y2popupmenu.String = stringDataNames;
         handles.Y2popupmenu.Enable = 'On'; 
+        
+        handles.X1popupmenu.String = logicalDataNames;        
+        handles.X1popupmenu.Enable = 'On';
     
+        handles.uipanel2.Title = 'Факторная выборка';    
         handles.uipanel1.Title = 'Выборки';
     
     case graphs.threeCatCriteria.name
@@ -782,8 +803,12 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y5popupmenu.Enable = 'On';
         
         handles.Y6popupmenu.String = stringDataNames;
-        handles.Y6popupmenu.Enable = 'On'; 
+        handles.Y6popupmenu.Enable = 'On';     
+        
+        handles.X1popupmenu.String = stringDataNames;        
+        handles.X1popupmenu.Enable = 'On';
     
+        handles.uipanel2.Title = 'Факторная выборка';
         handles.uipanel1.Title = 'Выборки';
         
     % таблица сопряженности
@@ -804,20 +829,154 @@ switch getMenuString(handles.GraphPopupmenu)
         handles.Y6popupmenu.Enable = 'On';   
     
         handles.uipanel1.Title = 'Выборки'; 
-         
+        
+        
+    case graphs.generalRegression.name        
+        
+        handles.ValueLevelText.Visible = 'On';        
+        handles.ValueLevelText.String = 'Тип связ предикторов';
+        handles.ValueLevelText.HorizontalAlignment = 'left';
+        
+        handles.GraphAdditionalPopupMenu1.Visible = 'On';
+        handles.GraphAdditionalPopupMenu1.String = {...
+            'Только Intercept',...
+            'Intercept и линейные составляющие' ,...
+            'Intercept, линейные составляющие и взаимодействия' ,...
+            'Intercept, линейные и квадратичные составляющие' ,...
+            'Intercept, линейные и квадратичные составляющие и взаимодействия' ...
+            };   
+        
+        handles.MuText.Visible = 'On';        
+        handles.MuText.String = 'Зависимая переменная';
+        handles.MuText.HorizontalAlignment = 'left';
+        
+        handles.GraphAdditionalPopupMenu2.Visible = 'On';
+        handles.GraphAdditionalPopupMenu2.String = numericDataNames;  
+
+        handles.GraphAdditionalPopupMenu3.Visible = 'On';
+        handles.GraphAdditionalPopupMenu3.String = {...
+            'Нормальное распределение зависимой выборки',...
+            'Пуассоновское распределение зависимой выборки',...
+            'Гамма-распределение зависимой выборки',...
+            'Обратное Гауссовское распределение зависимой выборки'...
+            };   
+        
+        handles.GraphAdditionalPopupMenu4.Visible = 'On';
+        handles.GraphAdditionalPopupMenu4.String = {...
+            'Связующая функция: единичная',...
+            'Связующая функция: логарифмическая',...
+            'Связующая функция: обратная',...
+            'Связующая функция: квадратичная',...
+            'Связующая функция: кубическая'...
+            };   
+        
+        handles.Y1popupmenu.String = numericAndLogicalDataNames;
+        handles.Y2popupmenu.String = numericAndLogicalDataNames;
+        handles.Y3popupmenu.String = numericAndLogicalDataNames;
+        handles.Y4popupmenu.String = numericAndLogicalDataNames;
+        handles.Y5popupmenu.String = numericAndLogicalDataNames;
+        handles.Y6popupmenu.String = numericAndLogicalDataNames;
+        
+        handles.Y1popupmenu.Enable = 'On';
+        handles.Y2popupmenu.Enable = 'On';
+        handles.Y3popupmenu.Enable = 'On';
+        handles.Y4popupmenu.Enable = 'On';
+        handles.Y5popupmenu.Enable = 'On';
+        handles.Y6popupmenu.Enable = 'On';   
+        
+        handles.X1popupmenu.String = numericAndLogicalDataNames;
+        handles.X2popupmenu.String = numericAndLogicalDataNames;
+        handles.X3popupmenu.String = numericAndLogicalDataNames;
+        handles.X4popupmenu.String = numericAndLogicalDataNames;
+        handles.X5popupmenu.String = numericAndLogicalDataNames;
+        handles.X6popupmenu.String = numericAndLogicalDataNames;
+        
+        handles.X1popupmenu.Enable = 'On';
+        handles.X2popupmenu.Enable = 'On';
+        handles.X3popupmenu.Enable = 'On';
+        handles.X4popupmenu.Enable = 'On';
+        handles.X5popupmenu.Enable = 'On';
+        handles.X6popupmenu.Enable = 'On';  
+    
+        handles.uipanel1.Title = 'Предикторы'; 
+        handles.uipanel2.Title = 'Предикторы'; 
+    
+    
+    case graphs.logitBinRegression.name        
+        
+        handles.ValueLevelText.Visible = 'On';        
+        handles.ValueLevelEdit.Visible = 'On';           
+        handles.ValueLevelEdit.String = '1';    
+        handles.ValueLevelText.String = 'Число испытаний: ';
+        handles.ValueLevelText.HorizontalAlignment = 'left';
+        
+        handles.GraphAdditionalPopupMenu1.Visible = 'On';
+        handles.GraphAdditionalPopupMenu1.String = {...
+            'Только Intercept',...
+            'Intercept и линейные составляющие' ,...
+            'Intercept, линейные составляющие и взаимодействия' ,...
+            'Intercept, линейные и квадратичные составляющие' ,...
+            'Intercept, линейные и квадратичные составляющие и взаимодействия' ...
+            };   
+        
+        handles.MuText.Visible = 'On';        
+        handles.MuText.String = 'Зависимая переменная';
+        handles.MuText.HorizontalAlignment = 'left';
+        
+        handles.GraphAdditionalPopupMenu2.Visible = 'On';
+        handles.GraphAdditionalPopupMenu2.String = logicalDataNames; 
+        
+        handles.GraphAdditionalPopupMenu4.Visible = 'On';
+        handles.GraphAdditionalPopupMenu4.String = {...
+            'Связующая функция: единичная',...
+            'Связующая функция: логарифмическая',...
+            'Связующая функция: логит',...
+            'Связующая функция: пробит',...
+            'Связующая функция: общая дважды логарифмируемая',...
+            'Связующая функция: обратная',...
+            'Связующая функция: квадратичная',...
+            'Связующая функция: кубическая'...
+            };   
+        
+        handles.Y1popupmenu.String = numericAndLogicalDataNames;
+        handles.Y2popupmenu.String = numericAndLogicalDataNames;
+        handles.Y3popupmenu.String = numericAndLogicalDataNames;
+        handles.Y4popupmenu.String = numericAndLogicalDataNames;
+        handles.Y5popupmenu.String = numericAndLogicalDataNames;
+        handles.Y6popupmenu.String = numericAndLogicalDataNames;
+        
+        handles.Y1popupmenu.Enable = 'On';
+        handles.Y2popupmenu.Enable = 'On';
+        handles.Y3popupmenu.Enable = 'On';
+        handles.Y4popupmenu.Enable = 'On';
+        handles.Y5popupmenu.Enable = 'On';
+        handles.Y6popupmenu.Enable = 'On';   
+        
+        handles.X1popupmenu.String = numericAndLogicalDataNames;
+        handles.X2popupmenu.String = numericAndLogicalDataNames;
+        handles.X3popupmenu.String = numericAndLogicalDataNames;
+        handles.X4popupmenu.String = numericAndLogicalDataNames;
+        handles.X5popupmenu.String = numericAndLogicalDataNames;
+        handles.X6popupmenu.String = numericAndLogicalDataNames;
+        
+        handles.X1popupmenu.Enable = 'On';
+        handles.X2popupmenu.Enable = 'On';
+        handles.X3popupmenu.Enable = 'On';
+        handles.X4popupmenu.Enable = 'On';
+        handles.X5popupmenu.Enable = 'On';
+        handles.X6popupmenu.Enable = 'On';  
+    
+        handles.uipanel1.Title = 'Предикторы'; 
+        handles.uipanel2.Title = 'Предикторы';
+        
     case graphs.logitregression.name
                 
         handles.MuText.Visible = 'On';        
         handles.MuText.String = 'Зависимая переменная';
+        handles.MuText.HorizontalAlignment = 'left';
         
         handles.GraphAdditionalPopupMenu2.Visible = 'On';
-        handles.GraphAdditionalPopupMenu2.String = stringAndLogicalDataNames;   
-        
-        handles.GraphAdditionalPopupMenu3.Visible = 'Off';
-        handles.GraphAdditionalPopupMenu3.String = {...
-            'Использовать взаимодействия',...
-            'Не использовать взаимодействия'...
-            };   
+        handles.GraphAdditionalPopupMenu2.String = stringDataNames;          
         
         handles.Y1popupmenu.String = numericAndLogicalDataNames;
         handles.Y2popupmenu.String = numericAndLogicalDataNames;
@@ -979,16 +1138,22 @@ switch getMenuString(handles.GraphPopupmenu)
             handles.Y6popupmenu.Enable = 'On';  
         end     
         
-    case graphs.threeNumCriteria.name
+    case {  graphs.twoNumCriteria.name, ...
+            graphs.threeNumCriteria.name,...
+            graphs.twoDichCriteria.name, ...
+            graphs.threeDichCriteria.name,...
+            graphs.twoCatCriteria.name,...
+            graphs.threeCatCriteria.name}
         
         if getMenuString(handles.GraphAdditionalPopupMenu1) == "Выборки независимы"
+            handles.X1popupmenu.Value = 1;
             handles.X1popupmenu.Enable = 'On';     
             
         elseif getMenuString(handles.GraphAdditionalPopupMenu1) == "Выборки зависимы"
-            handles.X1popupmenu.Enable = 'Off'; 
-            
+            handles.X1popupmenu.Value = 1;
+            handles.X1popupmenu.Enable = 'Off';
         else
-            assert(0,'некорректное значение свойства графика');   
+            
         end
         
     otherwise
@@ -1001,22 +1166,21 @@ function GraphAdditionalPopupMenu2_Callback(hObject, eventdata, handles)
 graphs = getappdata(handles.MainWindow,'graphs');
 
 switch getMenuString(handles.GraphPopupmenu)
+    
+          
+    otherwise         
+end
 
-    case graphs.logitregression.name        
-        
-        dataFrameNamesAndTypes = getappdata(handles.MainWindow,'dataFrameNamesAndTypes');
-        responseName = getMenuString(handles.GraphAdditionalPopupMenu2); 
-        
-        if dataFrameNamesAndTypes(2, dataFrameNamesAndTypes(1,:) == responseName) == "дихотомический"
-            handles.GraphAdditionalPopupMenu3.Visible = 'on';
-        else
-            handles.GraphAdditionalPopupMenu3.Visible = 'off';
-        end
-        
 
+function GraphAdditionalPopupMenu3_Callback(hObject, eventdata, handles)
+
+graphs = getappdata(handles.MainWindow,'graphs');
+
+switch getMenuString(handles.GraphPopupmenu)
+    
+          
+        
     otherwise
-        
-        assert(0,'некорректное значение графика');         
 end
 
 
@@ -1487,6 +1651,39 @@ switch getMenuString(handles.GraphPopupmenu)
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
                 isDatasetsRanged = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3));
                 
+                dataXName = getDataNames(handles, "X1");       
+                groupData = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName);
+                
+                if isempty(groupData) && size(datasets,2) ~= 2
+                    errordlg(['Для сбалансированного анализа должно быть выбрано ' ...
+                            '2 уникальные выборки'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                    
+                elseif ~isempty(groupData) && size(datasets,2) ~= 1
+                    errordlg(['Для несбалансированного анализа должна быть выбрана ' ...
+                            'только 1 зависимая выборка'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end 
+                
+                if ~isempty(groupData)
+                    
+                    initDataset = datasets;
+                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    showGroupedData(initDataset, groupData, dataXName, datasets);
+                    
+                    if isFailed
+                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
+                            'Выберите другую комбинацию выборок'],...
+                            'Ошибка задания данных','modal');
+                        delete(graphFigure);
+                        return
+                    end
+                end              
+                
                 infoStr = calculateCriteriaForTwoSamplesNumericData(...
                     datasets, significanceLevel, isDatasetsRanged, isDatasetsIndependent, tailStr);
                 
@@ -1500,7 +1697,7 @@ switch getMenuString(handles.GraphPopupmenu)
                 cmprTypeStr = getMenuString(handles.GraphAdditionalPopupMenu2);
                                 
                 if isempty(groupData) && size(datasets,2) < 3
-                    errordlg(['Для сбалансированного анализа дисперсий должно быть выбрано' ...
+                    errordlg(['Для сбалансированного анализа дисперсий должно быть выбрано ' ...
                             'не менее 3х уникальных выборок'],...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
@@ -1508,12 +1705,29 @@ switch getMenuString(handles.GraphPopupmenu)
                 end
                 
                 if ~isempty(groupData) && size(datasets,2) ~= 1
-                    errordlg(['Для несбалансирвоанного анализа дисперсий должна быть выбрана'...
+                    errordlg(['Для несбалансирвоанного анализа дисперсий должна быть выбрана '...
                             'одна целевая выборка и одна разбивающая целевую на группы'],...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
-                end              
+                end    
+                
+                if ~isempty(groupData) && size(replaceNaN(unique(groupData.dataset)),1) < 3
+                    errordlg(['Факторная выборка содежит менее 3 категорий. Выберите другую факторную выборку '...
+                            'или воспользйтесь критерием для 2х количественных выборок'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                    
+                end
+                
+                if ~isempty(groupData)
+                    
+                    initDataset = datasets;
+                    [example, ~] = getGroupedDataset(initDataset, groupData.dataset, dataXName);
+                    showGroupedData(initDataset, groupData.dataset, dataXName, example);                    
+                    
+                end
                 
                 infoStr = calculateCriteriaForMultipleSamplesNumericData(...
                     datasets, significanceLevel, isDatasetsIndependentStr, isDatasetsRangedStr, cmprTypeStr, groupData);
@@ -1537,14 +1751,40 @@ switch getMenuString(handles.GraphPopupmenu)
                 
             case graphs.twoDichCriteria.name
                 
-                isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
-                        
-                if size(datasets,2) ~= 2
-                    errordlg(' Выберите 2 уникальные выборки',...
+                isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));   
+                
+                dataXName = getDataNames(handles, "X1");       
+                groupData = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName);
+                
+                if isempty(groupData) && size(datasets,2) ~= 2
+                    errordlg(['Для сбалансированного анализа должно быть выбрано ' ...
+                            '2 уникальные выборки'],...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
+                    
+                elseif ~isempty(groupData) && size(datasets,2) ~= 1
+                    errordlg(['Для несбалансированного анализа должна быть выбрана ' ...
+                            'только 1 зависимая выборка'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
                 end    
+                
+                if ~isempty(groupData)
+                    
+                    initDataset = datasets;
+                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    showGroupedData(initDataset, groupData, dataXName, datasets);
+                    
+                    if isFailed
+                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
+                            'Выберите другую комбинацию выборок'],...
+                            'Ошибка задания данных','modal');
+                        delete(graphFigure);
+                        return
+                    end
+                end
                 
                 [~,emptyFlag] = replaceNanStrings(datasets);
                 
@@ -1561,13 +1801,39 @@ switch getMenuString(handles.GraphPopupmenu)
             case graphs.threeDichCriteria.name                
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
-                              
-                if size(datasets,2) < 3
-                    errordlg(' Выберите не менее 3х уникальных выборок',...
+                
+                dataXName = getDataNames(handles, "X1");       
+                groupData = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName);
+                
+                if isempty(groupData) && size(datasets,2) < 3
+                    errordlg(['Для сбалансированного анализа должно быть выбрано ' ...
+                            '3 и более уникальные выборки'],...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
-                end                
+                    
+                elseif ~isempty(groupData) && size(datasets,2) ~= 1
+                    errordlg(['Для несбалансированного анализа должна быть выбрана ' ...
+                            'только 1 зависимая выборка'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end    
+                
+                if ~isempty(groupData)
+                    
+                    initDataset = datasets;
+                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    showGroupedData(initDataset, groupData, dataXName, datasets);
+                    
+                    if isFailed
+                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
+                            'Выберите другую комбинацию выборок'],...
+                            'Ошибка задания данных','modal');
+                        delete(graphFigure);
+                        return
+                    end
+                end
                 
                 [~,emptyFlag] = replaceNanStrings(datasets);
                 
@@ -1584,13 +1850,38 @@ switch getMenuString(handles.GraphPopupmenu)
             case graphs.twoCatCriteria.name
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
-                    
-                if size(datasets,2) ~= 2
-                    errordlg(' Выберите 2 уникальные выборки',...
+                
+                dataXName = getDataNames(handles, "X1");       
+                groupData = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName);
+                
+                if isempty(groupData) && size(datasets,2) ~= 2
+                    errordlg(['Для сбалансированного анализа должно быть выбрано ' ...
+                            '2 уникальные выборки'],...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
-                end        
+                    
+                elseif ~isempty(groupData) && size(datasets,2) ~= 1
+                    errordlg(['Для несбалансированного анализа должна быть выбрана ' ...
+                            'только 1 зависимая выборка'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end    
+                
+                if ~isempty(groupData)
+                    initDataset = datasets;
+                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    showGroupedData(initDataset, groupData, dataXName, datasets);
+                    
+                    if isFailed
+                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
+                            'Выберите другую комбинацию выборок'],...
+                            'Ошибка задания данных','modal');
+                        delete(graphFigure);
+                        return
+                    end
+                end
                 
                 [~,emptyFlag] = replaceNanStrings(datasets);
                 
@@ -1607,13 +1898,39 @@ switch getMenuString(handles.GraphPopupmenu)
             case graphs.threeCatCriteria.name
                 
                 isDatasetsIndependent = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
-                          
-                if size(datasets,2) < 3
-                    errordlg(' Выберите не менее 3х уникальных выборок',...
+                
+                dataXName = getDataNames(handles, "X1");       
+                groupData = retrieveData(dataFrame, dataFrameNamesAndTypes, dataXName);
+                
+                if isempty(groupData) && size(datasets,2) < 3
+                    errordlg(['Для сбалансированного анализа должно быть выбрано ' ...
+                            '3 и более уникальные выборки'],...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
-                end        
+                    
+                elseif ~isempty(groupData) && size(datasets,2) ~= 1
+                    errordlg(['Для несбалансированного анализа должна быть выбрана ' ...
+                            'только 1 зависимая выборка'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end    
+                
+                if ~isempty(groupData)
+                    
+                    initDataset = datasets;
+                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    showGroupedData(initDataset, groupData, dataXName, datasets);
+                    
+                    if isFailed
+                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
+                            'Выберите другую комбинацию выборок'],...
+                            'Ошибка задания данных','modal');
+                        delete(graphFigure);
+                        return
+                    end
+                end      
                 
                 [~,emptyFlag] = replaceNanStrings(datasets);
                 
@@ -1687,11 +2004,129 @@ switch getMenuString(handles.GraphPopupmenu)
         showCrossTab(tbl, chi2, p, labels, dataNames);
         delete(graphFigure);
         return 
+        
+        
+    case graphs.generalRegression.name
+        
+        responseName = getMenuString(handles.GraphAdditionalPopupMenu2); 
+        predictorsNames = getDataNames(handles,...
+                        ["X1","X2","X3","X4","X5","X6","Y1","Y2","Y3","Y4","Y5","Y6"]); 
+        
+        if isempty(responseName) || responseName == ""
+            errordlg('Выберите зависимую переменную','Ошибка задания данных','modal');                    
+            delete(graphFigure);
+            return            
+        end        
+        
+        if isempty(predictorsNames)
+            errordlg('Выберите предикторы',...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end                  
+        
+        modelspec = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
+        distribution = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3));
+        linkFunction = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu4)); 
+        
+        response = retrieveData(dataFrame, dataFrameNamesAndTypes, responseName);
+        predictors = retrieveData(dataFrame, dataFrameNamesAndTypes, predictorsNames);
+        
+        if (distribution == "gamma" || distribution == "inverse gaussian") && any(response <= 0)
+             errordlg({"При распределении зависимая выборка не должна содержать значений меньших или равных нулю.";...
+                 "Выберите другую зависимую выборку или иное распределение зависимой выборки"},...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end
+                
+        [~,emptyFlag] = replaceNanStrings([predictors, response]);
+                
+        if emptyFlag
+            errordlg('После удаления NaN не осталось наблюдений. Выберите другие выборки',...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end                
+                
+        [infoTable, testTable] = calculateGeneralRegression(predictors, response, ...
+                                modelspec, distribution, linkFunction, predictorsNames, 1);
+                            
+        infoStr = [ getMenuString(handles.GraphAdditionalPopupMenu1);...
+                    getMenuString(handles.GraphAdditionalPopupMenu3);...
+                    getMenuString(handles.GraphAdditionalPopupMenu4);...
+                    "Справка по функции: https://www.mathworks.com/help/stats/fitglm.html"];
+                
+        titleStr = getMenuString(handles.GraphPopupmenu);
+        
+        showRegressionTable(infoTable, testTable, responseName, infoStr, titleStr);        
+        delete(graphFigure);
+        return
+        
     
+    case graphs.logitBinRegression.name           
+        
+        responseName = getMenuString(handles.GraphAdditionalPopupMenu2); 
+        predictorsNames = getDataNames(handles,...
+                        ["X1","X2","X3","X4","X5","X6","Y1","Y2","Y3","Y4","Y5","Y6"]); 
+        
+        if isempty(responseName) || responseName == ""
+            errordlg('Выберите зависимую переменную','Ошибка задания данных','modal');                    
+            delete(graphFigure);
+            return            
+        end        
+        
+        if isempty(predictorsNames)
+            errordlg('Выберите предикторы',...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end                  
+         
+        modelspec = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu1));
+        linkFunction = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu4)); 
+        trialsNum = getNumberFromEdit(handles.ValueLevelEdit);
+              
+        
+        if isnan(trialsNum) || trialsNum < 1 || isinteger(trialsNum)
+            errordlg(['Число испытания биномиального распределения ';....
+                'зависимой переменной должно быть задано натуральным числом'],...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end 
+        
+        
+        response = retrieveData(dataFrame, dataFrameNamesAndTypes, responseName);
+        predictors = retrieveData(dataFrame, dataFrameNamesAndTypes, predictorsNames);
+                        
+        [~,emptyFlag] = replaceNanStrings([predictors, response]);
+                
+        if emptyFlag
+            errordlg('После удаления NaN не осталось наблюдений. Выберите другие выборки',...
+                'Ошибка задания данных','modal');
+            delete(graphFigure);
+            return
+        end                
+                
+        [infoTable, testTable] = calculateGeneralRegression(predictors, response, ...
+                      modelspec, 'binomial', linkFunction, predictorsNames, trialsNum);
+                            
+        infoStr = [ getMenuString(handles.GraphAdditionalPopupMenu1);...
+                    getMenuString(handles.GraphAdditionalPopupMenu4);...
+                    "Число испытаний биномиального распределения: " + num2str(trialsNum);...
+                    "Справка по функции: https://www.mathworks.com/help/stats/fitglm.html"];
+                
+        titleStr = getMenuString(handles.GraphPopupmenu);
+        
+        showRegressionTable(infoTable, testTable, responseName, infoStr, titleStr);        
+        delete(graphFigure);
+        return
+        
+        
     case graphs.logitregression.name        
         
         responseName = getMenuString(handles.GraphAdditionalPopupMenu2); 
-        interactionsMode = getDictValue(getMenuString(handles.GraphAdditionalPopupMenu3));
         predictorsNames = getDataNames(handles,...
                         ["X1","X2","X3","X4","X5","X6","Y1","Y2","Y3","Y4","Y5","Y6"]); 
         
@@ -1709,13 +2144,7 @@ switch getMenuString(handles.GraphPopupmenu)
         end          
         
         response = retrieveData(dataFrame, dataFrameNamesAndTypes, responseName);
-        predictors = retrieveData(dataFrame, dataFrameNamesAndTypes, predictorsNames); 
-        
-        if dataFrameNamesAndTypes(2, dataFrameNamesAndTypes(1,:) == responseName) == "дихотомический"
-            isBinaryResponse = true;
-        else
-            isBinaryResponse = false;
-        end
+        predictors = retrieveData(dataFrame, dataFrameNamesAndTypes, predictorsNames);         
                 
         [~,emptyFlag] = replaceNanStrings([predictors, response]);
                 
@@ -1726,9 +2155,12 @@ switch getMenuString(handles.GraphPopupmenu)
             return
         end                
                 
-        infoTable = calculateLogit(predictors, response, interactionsMode, isBinaryResponse, predictorsNames);
+        infoTable = calculateLogit(predictors, response, predictorsNames);
         
-        showLogitTable(infoTable, responseName);        
+        titleStr = getMenuString(handles.GraphPopupmenu);
+        infoStr = "Справка по функции: https://www.mathworks.com/help/stats/mnrfit.html";
+        
+        showRegressionTable(infoTable, [], responseName, infoStr, titleStr);        
         delete(graphFigure);
         return
         
@@ -1739,6 +2171,3 @@ end
         
 graphFigure.Visible = 'On';
     
-
-
-

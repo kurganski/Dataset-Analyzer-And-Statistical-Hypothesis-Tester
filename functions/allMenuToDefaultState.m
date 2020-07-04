@@ -40,10 +40,17 @@ handles.GraphAdditionalPopupMenu3.Value = 1;
 handles.GraphAdditionalPopupMenu3.Visible = 'Off';
 handles.GraphAdditionalPopupMenu3.String = " ";
 
+handles.GraphAdditionalPopupMenu4.Value = 1;
+handles.GraphAdditionalPopupMenu4.Visible = 'Off';
+handles.GraphAdditionalPopupMenu4.String = " ";
+
 handles.ValueLevelEdit.Visible = 'Off';
 handles.ValueLevelText.Visible = 'Off';
 handles.MuEdit.Visible = 'Off';
 handles.MuText.Visible = 'Off';
+
+handles.ValueLevelText.HorizontalAlignment = 'right';
+handles.MuText.HorizontalAlignment = 'right';
 
 handles.ValueLevelText.String = " ";
 handles.MuText.String = " ";

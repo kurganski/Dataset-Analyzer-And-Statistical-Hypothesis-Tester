@@ -2,9 +2,10 @@ function [replacedNanData, emptyFlag] = replaceNanStrings( data )
 
 emptyFlag = false;
 
-if isstruct(data)
+if isstruct(data) 
     
     replacedNanData = data;
+    
     if isnumeric(data(1).dataset)
         
         unitedData = zeros(length(data(1).dataset), size(data,2));
@@ -16,16 +17,16 @@ if isstruct(data)
         unitedData = rmmissing(unitedData);
         
         if isempty(unitedData)
-            emptyFlag = true;            
+            emptyFlag = true;
             replacedNanData = [];
             return
         end
         
         for x = 1:size(replacedNanData,2)
             replacedNanData(x).dataset = unitedData(:,x);
-        end    
+        end
         
-    else  
+    else
         
         unitedData = strings(length(data(1).dataset), size(data,2));
         
@@ -36,18 +37,16 @@ if isstruct(data)
         unitedData = rmmissing(unitedData);
         
         if isempty(unitedData)
-            emptyFlag = true;        
+            emptyFlag = true;
             replacedNanData = [];
             return
         end
         
-        for x = 1:size(replacedNanData,2)            
+        for x = 1:size(replacedNanData,2)
             replacedNanData(x).dataset = string(unitedData(:,x));
         end
     end
-    
-else
-    
+else    
     replacedNanData = rmmissing(data);
 end
 

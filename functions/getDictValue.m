@@ -86,8 +86,59 @@ switch key
     case "Не использовать взаимодействия"
         value = 'off';
     
-%     case ""
-%         value = ;
+    case "Только Intercept"
+        value = 'constant';
+    
+    case "Intercept и линейные составляющие"
+        value = 'linear';
+    
+    case "Intercept, линейные составляющие и взаимодействия"
+        value = 'interactions';
+    
+    case "Intercept, линейные и квадратичные составляющие"
+        value = 'purequadratic';
+    
+    case "Intercept, линейные и квадратичные составляющие и взаимодействия"
+        value = 'quadratic';
+    
+    case "Нормальное распределение зависимой выборки"
+        value = 'normal';
+    
+    case "Биномиальное распределение зависимой выборки"
+        value = 'binomial';
+    
+    case "Пуассоновское распределение зависимой выборки"
+        value = 'poisson';
+    
+    case "Гамма-распределение зависимой выборки"
+        value = 'gamma';
+    
+    case "Обратное Гауссовское распределение зависимой выборки"
+        value = 'inverse gaussian';
+    
+    case "Связующая функция: единичная"
+        value = 'identity';
+    
+    case "Связующая функция: логарифмическая"
+        value = 'log';
+    
+    case "Связующая функция: логит"
+        value = 'logit';
+    
+    case "Связующая функция: пробит"
+        value = 'probit';
+    
+    case "Связующая функция: общая дважды логарифмируемая"
+        value = 'comploglog';
+    
+    case "Связующая функция: обратная"
+        value = 'reciprocal';
+    
+    case "Связующая функция: квадратичная"
+        value = 2;
+    
+    case "Связующая функция: кубическая"
+        value = 3;
         
         
     otherwise

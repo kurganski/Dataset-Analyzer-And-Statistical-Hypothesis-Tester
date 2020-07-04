@@ -8,6 +8,8 @@ for x = 1:size(dataFrame,2)
     
     if isstring(currentCol)
         
+        currentCol(ismissing(currentCol)) = '';
+        
         currentCol = char(currentCol);
         currentCol = table(currentCol);
         cellData(:,x) = table2cell(currentCol);

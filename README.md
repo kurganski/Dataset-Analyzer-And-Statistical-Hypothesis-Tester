@@ -1,7 +1,7 @@
 Dataset Analyzer And Statistical Hypothesis Tester
 ==================================================
 
-Version: 0.9
+Version: 1.1
 
 The application is intended for visualization and analysis of tabular data.
 
