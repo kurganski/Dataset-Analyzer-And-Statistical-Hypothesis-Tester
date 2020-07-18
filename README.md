@@ -1,7 +1,7 @@
 Dataset Analyzer And Statistical Hypothesis Tester
 ==================================================
 
-Version: 1.1
+Version: 1.2
 
 The application is intended for visualization and analysis of tabular data.
 
@@ -16,7 +16,7 @@ Key Features:
 
 
 System requirements:
-- Matlab 2017b and higher with the package "Statistics and Machine Learning Toolbox";
+- Matlab 2017a and higher with the package "Statistics and Machine Learning Toolbox";
 - screen resolution 1366x768 and higher.
 
 
@@ -36,5 +36,5 @@ System requirements:
 
 
 Системные требования:
-- Matlab 2017b и выше с пакетом "Statistics and Machine Learning Toolbox";
+- Matlab 2017a и выше с пакетом "Statistics and Machine Learning Toolbox";
 - разрешение экрана 1366х768 и выше.
