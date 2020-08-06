@@ -1,6 +1,7 @@
-function [datasets, isFailed] = getGroupedDataset( dataset, groupData, groupName )
+function [datasets, isNanColExists, isZeroColExists] = getGroupedDataset( dataset, groupData, groupName )
 
-isFailed = false;
+isNanColExists = false;
+isZeroColExists = false;
 
 if size(dataset.dataset) ~= size(groupData)
     assert(0,'–азмеры группирующей и целевой выборки не совпадают');
@@ -11,28 +12,31 @@ datasets = dataset;
 
 for x = 1:length(groups)
     
+    group = dataset.dataset;
+    
     if dataset.type == "дихотомический"
         
-        group = dataset.dataset;
         group(groupData ~= groups(x)) = 0;
         
-        if ~any(group)
-            isFailed = true;
+        if all(group == 0) && x < 3 
+           isZeroColExists = true; 
         end
-        
+                
     elseif dataset.type == "непрерывный"        
         
-        group = dataset.dataset;
         group(groupData ~= groups(x)) = NaN;
+        
+        if all(isnan(group))
+           isNanColExists = true; 
+        end
     
     elseif dataset.type == "номинативный"        
         
-        group = dataset.dataset;
-        group(groupData ~= groups(x)) = "";
+        group(groupData ~= groups(x)) = ""; 
         
-        if ~any(group == "")
-            isFailed = true;
-        end        
+        if all(group == "")
+           isNanColExists = true; 
+        end
         
     else
         assert(0,"неизвестный тип данных")
@@ -42,6 +46,7 @@ for x = 1:length(groups)
     datasets(x).name = dataset.name + ": " + string(groupName) + " = " +string(groups(x)) + "";
     datasets(x).type = dataset.type;
 end
+
 
 end
 

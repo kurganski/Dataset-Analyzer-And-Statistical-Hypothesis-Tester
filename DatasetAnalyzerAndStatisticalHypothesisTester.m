@@ -233,7 +233,7 @@ function AboutMenu_Callback(hObject, eventdata, handles)
 msgbox (...
     {...
     "Dataset Analyzer And Statistical Hypothesis Tester" ;...
-    "Версия: 1.2" ;...
+    "Версия: 1.21" ;...
     "" ;...
     "Приложение предназначено для визуализации и анализа табличных данных.";...
     "Основные особенности:" ;...
@@ -1667,17 +1667,24 @@ switch getMenuString(handles.GraphPopupmenu)
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return                    
-                end 
+                end                 
+                
+                if ~isempty(groupData) && size(replaceNaN(unique(groupData)),1) < 2
+                    errordlg('Факторная выборка содежит менее 2 категорий. Выберите другую факторную выборку' ,...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return
+                end                
                 
                 if ~isempty(groupData)
                     
                     initDataset = datasets;
-                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    [datasets, isNanColExists] = getGroupedDataset(initDataset, groupData, dataXName);
                     showGroupedData(initDataset, groupData, dataXName, datasets);
                     
-                    if isFailed
-                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
-                            'Выберите другую комбинацию выборок'],...
+                    if isNanColExists
+                        errordlg(['Одна или более из выборок после разбиения факторной выборкой пустая. '...
+                            'Выберите другую комбинацию выборок или сгенерируйте новую факторную выборку'],...
                             'Ошибка задания данных','modal');
                         delete(graphFigure);
                         return
@@ -1714,11 +1721,10 @@ switch getMenuString(handles.GraphPopupmenu)
                 
                 if ~isempty(groupData) && size(replaceNaN(unique(groupData.dataset)),1) < 3
                     errordlg(['Факторная выборка содежит менее 3 категорий. Выберите другую факторную выборку '...
-                            'или воспользйтесь критерием для 2х количественных выборок'],...
+                            'или сгенерируйте дихотомическую факторную выборку и воспользйтесь критерием для 2х количественных выборок'],...
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return
-                    
                 end
                 
                 if ~isempty(groupData)
@@ -1769,21 +1775,37 @@ switch getMenuString(handles.GraphPopupmenu)
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return                    
-                end    
+                end                                                       
+                
+                if ~isempty(groupData) && size(replaceNaN(unique(groupData)),1) < 2
+                    errordlg('Факторная выборка содежит менее 2 категорий. Выберите другую факторную выборку ',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end
                 
                 if ~isempty(groupData)
                     
                     initDataset = datasets;
-                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    [datasets, isNanColExists, isZeroColExists] = getGroupedDataset(initDataset, groupData, dataXName);
                     showGroupedData(initDataset, groupData, dataXName, datasets);
                     
-                    if isFailed
-                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
+                    if isNanColExists
+                        errordlg(['Одна или более из выборок после разбиения факторной выборкой пустая. '...
                             'Выберите другую комбинацию выборок'],...
                             'Ошибка задания данных','modal');
                         delete(graphFigure);
                         return
-                    end
+                    end                    
+                    
+                    if isZeroColExists
+                        errordlg(['Одна или более из выборок после разбиения факторной выборкой содержит только 0. '....
+                            'В этом случае таблица сопряженности имеет недопустимую начальную размерность 1х2. '...
+                            'Выберите другую комбинацию выборок или сгенерируйте новую факторную выборку'],...
+                            'Ошибка задания данных','modal');
+                        delete(graphFigure);
+                        return
+                    end 
                 end
                 
                 [~,emptyFlag] = replaceNanStrings(datasets);
@@ -1818,17 +1840,34 @@ switch getMenuString(handles.GraphPopupmenu)
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return                    
-                end    
+                end                    
+                
+                if ~isempty(groupData) && size(replaceNaN(unique(groupData)),1) < 3
+                    errordlg(['Факторная выборка содежит менее 3 категорий. Выберите другую факторную выборку '...
+                            'или сгенерируйте дихотомическую факторную выборку и воспользйтесь критерием для 2х дихотомических выборок'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end
                 
                 if ~isempty(groupData)
                     
                     initDataset = datasets;
-                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    [datasets, isNanColExists, isZeroColExists] = getGroupedDataset(initDataset, groupData, dataXName);
                     showGroupedData(initDataset, groupData, dataXName, datasets);
                     
-                    if isFailed
-                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
-                            'Выберите другую комбинацию выборок'],...
+                    if isNanColExists
+                        errordlg(['Одна или более из выборок после разбиения факторной выборкой пустая. '...
+                            'Выберите другую комбинацию выборок или сгенерируйте новую факторную выборку'],...
+                            'Ошибка задания данных','modal');
+                        delete(graphFigure);
+                        return
+                    end              
+                    
+                    if isZeroColExists
+                        errordlg(['Одна или более из первых выборок после разбиения факторной выборкой содержит только 0. '....
+                            'В этом случае таблица сопряженности имеет недопустимую начальную размерность 1х2. '...
+                            'Выберите другую комбинацию выборок или сгенерируйте новую факторную выборку'],...
                             'Ошибка задания данных','modal');
                         delete(graphFigure);
                         return
@@ -1867,16 +1906,23 @@ switch getMenuString(handles.GraphPopupmenu)
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return                    
-                end    
+                end                                        
+                
+                if ~isempty(groupData) && size(replaceNaN(unique(groupData)),1) < 2
+                    errordlg('Факторная выборка содежит менее 2 категорий. Выберите другую факторную выборку ',...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end
                 
                 if ~isempty(groupData)
                     initDataset = datasets;
-                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    [datasets, isNanColExists] = getGroupedDataset(initDataset, groupData, dataXName);
                     showGroupedData(initDataset, groupData, dataXName, datasets);
                     
-                    if isFailed
-                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
-                            'Выберите другую комбинацию выборок'],...
+                    if isNanColExists
+                        errordlg(['Одна или более из выборок после разбиения факторной выборкой пустая. '...
+                            'Выберите другую комбинацию выборок или сгенерируйте новую факторную выборку'],...
                             'Ошибка задания данных','modal');
                         delete(graphFigure);
                         return
@@ -1915,17 +1961,25 @@ switch getMenuString(handles.GraphPopupmenu)
                         'Ошибка задания данных','modal');
                     delete(graphFigure);
                     return                    
-                end    
+                end                     
+                
+                if ~isempty(groupData) && size(replaceNaN(unique(groupData)),1) < 3
+                    errordlg(['Факторная выборка содежит менее 3 категорий. Выберите другую факторную выборку '...
+                            'или сгенерируйте дихотомическую факторную выборку и воспользйтесь критерием для 2х номинативных выборок'],...
+                        'Ошибка задания данных','modal');
+                    delete(graphFigure);
+                    return                    
+                end
                 
                 if ~isempty(groupData)
                     
                     initDataset = datasets;
-                    [datasets, isFailed] = getGroupedDataset(initDataset, groupData, dataXName);
+                    [datasets, isNanColExists] = getGroupedDataset(initDataset, groupData, dataXName);
                     showGroupedData(initDataset, groupData, dataXName, datasets);
                     
-                    if isFailed
-                        errordlg(['Выбранная факторная выборка не разбивает целевую выборку на группы. '...
-                            'Выберите другую комбинацию выборок'],...
+                    if isNanColExists
+                        errordlg(['Одна или более из выборок после разбиения факторной выборкой пустая. '...
+                            'Выберите другую комбинацию выборок или сгенерируйте новую факторную выборку'],...
                             'Ошибка задания данных','modal');
                         delete(graphFigure);
                         return
