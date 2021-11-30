@@ -14,7 +14,10 @@ catch
     testTable = [];
 end
 
-infoTable = mdl.Coefficients;
+infoTable = table2cell(mdl.Coefficients);
+infoTable(:,end+1:end+2) = num2cell(coefCI(mdl));
+infoTable = cell2table(infoTable, 'VariableNames', [fieldnames(summary(mdl.Coefficients)); 'low_CI'; 'high_CI']', ...
+                                    'RowNames', mdl.CoefficientNames);
 
 oldRowNames = string(infoTable.Properties.RowNames);
 newRowNames = setNewNames(oldRowNames, "x", varNames);
