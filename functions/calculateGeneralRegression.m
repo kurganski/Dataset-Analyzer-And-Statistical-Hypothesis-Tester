@@ -1,16 +1,14 @@
 function [infoTable, testTable] = calculateGeneralRegression( predictors, response, modelspec, ...
                                                 distribution, linkFunction, varNames, trialsNum )
+    
+min_predictors = min(predictors);
+max_predictors = max(predictors);    
+normalizedPredictors = (predictors - min_predictors) ./ max_predictors;
 
-if distribution == "binomial" 
-    
-    min_predictors = min(predictors);
-    max_predictors = max(predictors);
-    
-    normalizedPredictors = (predictors - min_predictors) ./ max_predictors;
-    
+if distribution == "binomial"     
     mdl = fitglm(normalizedPredictors, response, modelspec, 'BinomialSize', trialsNum, ...
                     'Distribution', distribution, 'Link', linkFunction);
-else
+else    
     mdl = fitglm(predictors, response, modelspec, 'Distribution', distribution, 'Link', linkFunction);    
 end
 
@@ -24,7 +22,7 @@ infoTable = table2cell(mdl.Coefficients);
 infoTable(:,end+1:end+2) = num2cell(coefCI(mdl));
 
 if ~isequal(modelspec,'constant')
-    infoTable(:,end+1:end+2) = num2cell(zeros(mdl.NumCoefficients,2));
+    infoTable(:,end+1:end+2) = num2cell(zeros(mdl.NumCoefficients,2)); 
     infoTable(2:2+length(min_predictors)-1, end-1:end) = num2cell([min_predictors; max_predictors]');
 end
 
